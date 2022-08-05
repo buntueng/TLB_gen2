@@ -1,5 +1,5 @@
 #include<main.hpp>
-
+char node_ID = '1';
 SoftwareSerial mySerial (rxPin, txPin);
 bool exe_cmd_status = false;
 String cmd = "";
@@ -179,51 +179,66 @@ void check_message(void)
 
 void execute_command(void)
 {
-  switch(cmd[0])
+  mySerial.println(cmd);
+  if (cmd[0] == node_ID)
   {
-    case '1':
+    switch(cmd[1])
     {
-      mySerial.println("Box1");
-      silo1_state = 0;
-      run_silo1 = true;
-      silo1_timer = millis();
-      digitalWrite(EN_pin,LOW);
-      break;
-    }
-    case '2':
-    {
-      mySerial.println("Box2");
-      silo2_state = 0;
-      run_silo2 = true;
-      silo2_timer = millis();
-      digitalWrite(EN_pin,LOW);
-      break;
-    }
-    case '3':
-    {
-      mySerial.println("Box3");
-      silo3_state = 0;
-      run_silo3 = true;
-      silo3_timer = millis();
-      digitalWrite(EN_pin,LOW);
-      break;
-    }
-    case '4':
-    {
-      mySerial.println("Box4");
-      silo4_state = 0;
-      run_silo4 = true;
-      silo4_timer = millis();
-      digitalWrite(EN_pin,LOW);
-      break;
-    }
-    default:
-    {
-      run_silo1 = false;
-      run_silo2 = false;
-      run_silo3 = false;
-      run_silo4 = false;
-      digitalWrite(EN_pin,HIGH);
+      case '1':
+      {
+        mySerial.println("Box1");
+        silo1_state = 0;
+        run_silo1 = true;
+        run_silo2 = false;
+        run_silo3 = false;
+        run_silo4 = false;
+        silo1_timer = millis();
+        digitalWrite(EN_pin,LOW);
+        break;
+      }
+      case '2':
+      {
+        mySerial.println("Box2");
+        silo2_state = 0;
+        run_silo1 = false;
+        run_silo2 = true;
+        run_silo3 = false;
+        run_silo4 = false;
+        silo2_timer = millis();
+        digitalWrite(EN_pin,LOW);
+        break;
+      }
+      case '3':
+      {
+        mySerial.println("Box3");
+        run_silo1 = false;
+        run_silo2 = false;
+        run_silo3 = true;
+        run_silo4 = false;
+        silo3_timer = millis();
+        digitalWrite(EN_pin,LOW);
+        break;
+      }
+      case '4':
+      {
+        mySerial.println("Box4");
+        silo4_state = 0;
+        run_silo1 = false;
+        run_silo2 = false;
+        run_silo3 = false;
+        run_silo4 = true;
+        silo4_timer = millis();
+        digitalWrite(EN_pin,LOW);
+        break;
+      }
+      default:
+      {
+        run_silo1 = false;
+        run_silo2 = false;
+        run_silo3 = false;
+        run_silo4 = false;
+        digitalWrite(EN_pin,HIGH);
+      }
     }
   }
   exe_cmd_status = false;

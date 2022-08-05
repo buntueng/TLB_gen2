@@ -9,25 +9,25 @@ const int rolling_time = 2000;            // 20 micro seconds
 const int rolling_constant = 2000;
 // ========== silo control bits =====
 bool run_silo1 = false;
-bool silo1_state = 0;
+int silo1_state = 0;
 bool motor_silo1_logic = 0;
 unsigned long silo1_timer = 0;
 unsigned long silo1_logic_timer = 0;
 
 bool run_silo2 = false;
-bool silo2_state = 0;
+int silo2_state = 0;
 bool motor_silo2_logic = 0;
 unsigned long silo2_timer = 0;
 unsigned long silo2_logic_timer = 0;
 
 bool run_silo3 = false;
-bool silo3_state = 0;
+int silo3_state = 0;
 bool motor_silo3_logic = 0;
 unsigned long silo3_timer = 0;
 unsigned long silo3_logic_timer = 0;
 
 bool run_silo4 = false;
-bool silo4_state = 0;
+int silo4_state = 0;
 bool motor_silo4_logic = 0;
 unsigned long silo4_timer = 0;
 unsigned long silo4_logic_timer = 0;
@@ -53,30 +53,63 @@ void loop()
   //======== run roller under silo1 ==============
   if(run_silo1)
   {
-    if (micros()-silo1_logic_timer>=rolling_time)
+    if (silo1_state != 1 || silo1_state != 3)
     {
-      motor_silo1_logic = !motor_silo1_logic;
-      digitalWrite(X_STEP_pin,motor_silo1_logic);
-      silo1_logic_timer = micros();
-    }
-    if(silo1_state)
-    {
-      digitalWrite(X_DIR_pin,HIGH);
-      if (millis() - silo1_timer >= rolling_constant)
+      if (micros()-silo1_logic_timer>=rolling_time)
       {
-        silo1_timer = millis();
-        silo1_state = 1;
+        motor_silo1_logic = !motor_silo1_logic;
+        digitalWrite(X_STEP_pin,motor_silo1_logic);
+        silo1_logic_timer = micros();
       }
     }
-    else
+    switch(silo1_state)
     {
-      digitalWrite(X_DIR_pin,LOW);
-      if (millis() - silo1_timer >= rolling_constant)
+      case 0:
+      {
+        digitalWrite(X_DIR_pin,HIGH);
+        if (millis() - silo1_timer >= rolling_constant)
+        {
+          silo1_timer = millis();
+          silo1_state = 1;
+        }
+        break;
+      }
+
+      case 1:
+      {
+        if (millis() - silo1_timer >= 100)
+        {
+          silo1_timer = millis();
+          silo1_state = 2;
+        }
+        break;
+      }
+
+      case 2:
+      {
+        digitalWrite(X_DIR_pin,LOW);
+        if (millis() - silo1_timer >= rolling_constant)
+          {
+            silo1_timer = millis();
+            silo1_state = 3;
+          }
+        break;
+      }
+      case 3:
+      {
+        if (millis() - silo1_timer >= 100)
         {
           silo1_timer = millis();
           silo1_state = 0;
         }
-    }
+        break;
+      }
+      default:
+      {
+        silo1_state = 0;
+        run_silo1 = false;
+      }
+    }    
   }
   //======== run roller under silo2 ==============
   if(run_silo2)

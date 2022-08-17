@@ -1,3 +1,7 @@
+#include <SoftwareSerial.h>
+const int RX = 4;
+const int TX = 5;
+SoftwareSerial mySerial(RX, TX);
 // ========== motor pin ======================
 const int m1_pin1 = 10;
 const int m1_pin2 = 11;
@@ -21,11 +25,12 @@ unsigned long state_timer = 0;
 unsigned int main_state = 0;
 
 void setup() {
+  mySerial.begin(9600);
   pinMode(m1_pin1,OUTPUT);
   pinMode(m1_pin2,OUTPUT);
   off_motor();
-  pinMode(sticker_detect_pin,INPUT);
-  pinMode(tube_detect_pin,INPUT);
+  pinMode(sticker_detect_pin,OUTPUT);
+  pinMode(tube_detect_pin,OUTPUT);
   pinMode(sticker_detec_pin,INPUT);
   pinMode(tube_detect_pin1,INPUT);
   pinMode(tube_detect_pin2,INPUT);
@@ -34,8 +39,9 @@ void setup() {
 
 void loop()
 {
+  mySerial.println(main_state);
   // ========= get input sensors ===========
-  tube_drop_logic = digitalRead(tube_detect_pin1) & digitalRead(tube_detect_pin2) & digitalRead(tube_detect_pin3);
+  tube_drop_logic = digitalRead(tube_detect_pin1) && digitalRead(tube_detect_pin2) && digitalRead(tube_detect_pin3);
   sticker_detect_logic = digitalRead(sticker_detect_pin);
   //========================================
   digitalWrite(tube_detect_pin,tube_drop_logic);

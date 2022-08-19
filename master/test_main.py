@@ -4,8 +4,13 @@ import bme280
 import dht
 import rp2
 
+device_id = '1'
 pc_command = ""
+resp_message = ""
 execute_flag = False
+resp_flag = False
+wait_device_resp = False
+wait_pc_resp = False
 running_state = 0
 
 rolling_motor_dir_pin = Pin(17,Pin.OUT)
@@ -88,8 +93,10 @@ sliding_motor.active(0)
 initial_io()
 
 
-
 while True:
+    # get proximeter sensors
+
+    # =========== command from pc ============
     if(pc_link.any()):
         char_cmd = pc_link.read(1)
         char_cmd = char_cmd.decode()
@@ -97,33 +104,52 @@ while True:
             execute_flag = True
         else:
             pc_command = pc_command + char_cmd
+    # =========== response from slaves ============
+    if(device_link.any()):
+        device_resp = device_link.read(1)
+        device_resp = device_resp.decode()
+        if device_resp == '\n':
+            resp_flag = True
+        else:
+            resp_message = resp_message + device_resp
 
     if execute_flag==True:
         # check command
         if len(pc_command) > 0:
-            if pc_command[0] == 'e':        # return [temperature,humidity,pressure]
-                message = ""
-                try:
-                    dht_sensor.measure()
-                    message = str(dht_sensor.temperature()) + "," + str(dht_sensor.humidity()) + "," + str(bmp280_sensor.values[1])+"\n"
-                except:
-                    message = "0,0,0\n"
-                pc_response(resp_message=message)
-            elif pc_command[0] == 'r':
-                message = "reset\n"
-                pc_response(resp_message=message)
-                time.sleep(0.1)
-                reset()
-            elif pc_command[0] == 'g':
-                message = "run box number\n"
-                pc_response(resp_message=message)
-            
-            elif pc_command[0] == 'c':
-                message = check_running_state()
-                pc_response(resp_message=message)
-
+            if pc_command[0] == '1':            # command to master
+                if pc_command[1] == 'e':        # return [temperature,humidity,pressure]
+                    message = ""
+                    try:
+                        dht_sensor.measure()
+                        message = str(dht_sensor.temperature()) + "," + str(dht_sensor.humidity()) + "," + str(bmp280_sensor.values[1])+"\n"
+                    except:
+                        message = "0,0,0\n"
+                    pc_response(resp_message=message)
+                elif pc_command[1] == 'r':
+                    message = "reset\n"
+                    pc_response(resp_message=message)
+                    time.sleep(0.1)
+                    reset()
+                elif pc_command[1] == 'g':
+                    message = "run box number\n"
+                    pc_response(resp_message=message)
+                
+                elif pc_command[1] == 'c':
+                    message = check_running_state()
+                    pc_response(resp_message=message)
+            else:
+                # other send commad to slaves
+                device_message = pc_command.encode()
+                device_link.write(bytes( ord(ch) for ch in device_message))
+                wait_pc_resp = True
             execute_flag = False
             pc_command = ""
+
+    if wait_pc_resp:
+        pc_resp_message = resp_message.encode()
+        resp_message = ""
+        wait_pc_resp = False
+        pc_response(pc_resp_message)
 
 
 

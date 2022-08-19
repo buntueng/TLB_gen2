@@ -10,8 +10,12 @@ resp_message = ""
 execute_flag = False
 resp_flag = False
 wait_device_resp = False
-wait_pc_resp = False
+wait_slave2pc = False
 running_state = 0
+
+present_silo = '0'
+run_main_state = False
+main_state = 0
 
 rolling_motor_dir_pin = Pin(17,Pin.OUT)
 sliding_motor_dir_pin = Pin(19,Pin.OUT)
@@ -42,7 +46,7 @@ pc_link.read()              # clear data in serial port buffer
 device_link.read()
 
 #========== sub functions ==========
-def main_state():
+def save_params():
     pass
 
 def initial_io():
@@ -113,11 +117,12 @@ while True:
         else:
             resp_message = resp_message + device_resp
 
+
     if execute_flag==True:
         # check command
         if len(pc_command) > 0:
-            if pc_command[0] == '1':            # command to master
-                if pc_command[1] == 'e':        # return [temperature,humidity,pressure]
+            if pc_command[0] == device_id:              # command to master
+                if pc_command[1] == 'e':                # return [temperature,humidity,pressure]
                     message = ""
                     try:
                         dht_sensor.measure()
@@ -131,7 +136,10 @@ while True:
                     time.sleep(0.1)
                     reset()
                 elif pc_command[1] == 'g':
-                    message = "run box number\n"
+                    present_silo = pc_command[2]
+                    run_main_state = True
+                    main_state = 0
+                    message = "run silo motor\n"
                     pc_response(resp_message=message)
                 
                 elif pc_command[1] == 'c':
@@ -141,16 +149,44 @@ while True:
                 # other send commad to slaves
                 device_message = pc_command.encode()
                 device_link.write(bytes( ord(ch) for ch in device_message))
-                wait_pc_resp = True
+                wait_slave2pc = True                                         # wait slaves response to pc
             execute_flag = False
             pc_command = ""
 
-    if wait_pc_resp:
+    if wait_slave2pc:
         pc_resp_message = resp_message.encode()
         resp_message = ""
-        wait_pc_resp = False
+        wait_slave2pc = False
         pc_response(pc_resp_message)
-
+    
+    if run_main_state:
+        if main_state == 0:
+            main_state = 1
+            
+        elif main_state == 1:
+            pass
+        elif main_state == 2:
+            pass
+        elif main_state == 3:
+            pass
+        elif main_state == 4:
+            pass
+        elif main_state == 5:
+            pass
+        elif main_state == 6:
+            pass
+        elif main_state == 7:
+            pass
+        elif main_state == 8:
+            pass
+        elif main_state == 9:
+            pass
+        elif main_state == 10:
+            pass
+        elif main_state == 11:
+            pass
+        elif main_state == 12:
+            pass
 
 
 

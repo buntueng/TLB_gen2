@@ -7,6 +7,8 @@ master_command = ""
 execute_flag = False
 running_state = 0
 
+debugging = True
+
 #======================================================================================================
 @rp2.asm_pio(set_init=rp2.PIO.OUT_LOW)
 def run_motor1():
@@ -66,25 +68,25 @@ motor4_controller = rp2.StateMachine(3, run_motor4, freq=2000, set_base=Pin(26))
 #========== sub functions ==========
 def on_motor(motor_number):
     if motor_number == 1:
-        silo1_motor.active(1)
-        silo2_motor.active(0)
-        silo3_motor.active(0)
-        silo4_motor.active(0)
+        motor1_controller.active(1)
+        motor2_controller.active(0)
+        motor3_controller.active(0)
+        motor4_controller.active(0)
     elif motor_number == 2:
-        silo1_motor.active(0)
-        silo2_motor.active(1)
-        silo3_motor.active(0)
-        silo4_motor.active(0)
+        motor1_controller.active(0)
+        motor2_controller.active(1)
+        motor3_controller.active(0)
+        motor4_controller.active(0)
     elif motor_number == 3:
-        silo1_motor.active(0)
-        silo2_motor.active(0)
-        silo3_motor.active(1)
-        silo4_motor.active(0)
+        motor1_controller.active(0)
+        motor2_controller.active(0)
+        motor3_controller.active(1)
+        motor4_controller.active(0)
     elif motor_number == 4:
-        silo1_motor.active(0)
-        silo2_motor.active(0)
-        silo3_motor.active(0)
-        silo4_motor.active(1)
+        motor1_controller.active(0)
+        motor2_controller.active(0)
+        motor3_controller.active(0)
+        motor4_controller.active(1)
     elif motor_number == 0:
         pass
     
@@ -121,8 +123,6 @@ off_motor()
 initial_io()
 
 while True:
-    # get proximeter sensors
-
     # =========== command from master ============
     if(device_link.any()):
         char_cmd = device_link.read(1)
@@ -133,6 +133,9 @@ while True:
             master_command = master_command + char_cmd
 
     if execute_flag==True:
+        if debugging:
+            message = "receive CMD:" + master_command
+            print(message)
         # check command
         if len(master_command) > 0:
             if master_command[0] == device_id:
@@ -157,6 +160,7 @@ while True:
                     current_silo = 0
                     message = "OK\n"
                     resp_485(message=message)
+
             execute_flag = False
             master_command = ""
     

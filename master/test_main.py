@@ -32,7 +32,7 @@ prox3_pin = Pin(12,Pin.IN)
 prox4_pin = Pin(13,Pin.IN)
 
 roller_limit_pin = Pin(14,Pin.IN)
-front_and_back_limit_pin = Pin(15,Pin.IN)
+front_and_back_limit_pin = Pin(15,Pin.IN,Pin.PULL_UP)
 printer_limit_pin = Pin(22,Pin.IN)
 
 tube_drop_pin = Pin(6,Pin.IN)
@@ -178,7 +178,7 @@ while True:
     # =========== response from slaves ============
     if(device_link.any()):
         device_resp = device_link.read(1)
-        device_resp = device_resp.decode()
+        # device_resp = device_resp.decode()
         if device_resp == '\n':
             resp_flag = True
         else:
@@ -216,20 +216,23 @@ while True:
                 
                 elif pc_command[1] == 'c':
                     message = check_running_state()
+                    message = str(main_state)
                     pc_response(resp_message=message)
             else:
                 # other send commad to slaves
-                device_message = pc_command.encode()
+                device_message = pc_command + "\n"
                 device_link.write(bytes( ord(ch) for ch in device_message))
                 wait_slave2pc = True                                         # wait slaves response to pc
             execute_flag = False
             pc_command = ""
 
     if wait_slave2pc:
-        pc_resp_message = resp_message.encode()
-        resp_message = ""
-        wait_slave2pc = False
-        pc_response(pc_resp_message)
+        if resp_flag:
+            resp_flag = False
+            pc_resp_message = resp_message + "\n"
+            resp_message = ""
+            wait_slave2pc = False
+            pc_response(pc_resp_message)
     
     if run_main_state:
         #======== check prox sensor ======
@@ -263,6 +266,7 @@ while True:
                     main_state = 200
             elif main_state == 2:
                 if resp_flag:
+                    print(resp_message)
                     if resp_message[0:2] == '3OK':
                         main_state =3
                     resp_flag = False
@@ -309,7 +313,7 @@ while True:
                     main_state = 10
             elif main_state == 10:
                 if present_silo == 4:
-                    main_state == 11
+                    main_state = 11
                     sliding_motor.active(0)
             elif main_state == 11:
                 main_state_timer = time.ticks_ms()

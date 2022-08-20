@@ -148,7 +148,6 @@ while True:
                     resp_485(message=message)   
 
                 elif master_command[1] == 'c':
-                    run_motor_flag = True
                     message = "Complete\n"
                     resp_485(message=message)
 
@@ -159,7 +158,7 @@ while True:
                     message = "OK\n"
                     resp_485(message=message)
             execute_flag = False
-            pc_command = ""
+            master_command = ""
     
 
 

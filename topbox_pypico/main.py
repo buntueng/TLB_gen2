@@ -173,7 +173,7 @@ while True:
                     message = "OK\n"
                     resp_485(message=message)
             execute_flag = False
-            pc_command = ""
+            master_command = ""
     # =========== run motor ==============
     if run_motor_flag:
         if motor_state == 0:

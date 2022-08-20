@@ -155,8 +155,8 @@ def run_sliding_motor():
     nop()
     wrap()
 
-rolling_motor = rp2.StateMachine(0, run_roller_motor, freq=20000, set_base=Pin(16))      # GPIO16 => pulse, GPIO17 => direction
-sliding_motor = rp2.StateMachine(1, run_sliding_motor, freq=20000, set_base=Pin(18))      # GPIO18 => pulse, GPIO19 => direction
+rolling_motor = rp2.StateMachine(0, run_roller_motor, freq=200000, set_base=Pin(16))      # GPIO16 => pulse, GPIO17 => direction
+sliding_motor = rp2.StateMachine(1, run_sliding_motor, freq=200000, set_base=Pin(18))      # GPIO18 => pulse, GPIO19 => direction
 rolling_motor.active(0)
 sliding_motor.active(0)
 initial_io()

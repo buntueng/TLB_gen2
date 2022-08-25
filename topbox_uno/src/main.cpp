@@ -5,7 +5,7 @@ bool exe_cmd_status = false;
 String cmd = "";
 
 // ========== defined roller speed and time rolling constant =========
-const int rolling_time = 2000;              // 2000 micro seconds
+const int rolling_time = 3000;              // 2000 micro seconds
 const int rolling_constant = 1500;        // time to rolling forward or backward
 // ========== silo control bits =====
 bool run_silo1 = false;
@@ -53,14 +53,11 @@ void loop()
   //======== run roller under silo1 ==============
   if(run_silo1)
   {
-    if (silo1_state != 1 || silo1_state != 3)
+    if (micros()-silo1_logic_timer>=rolling_time)
     {
-      if (micros()-silo1_logic_timer>=rolling_time)
-      {
-        motor_silo1_logic = !motor_silo1_logic;
-        digitalWrite(X_STEP_pin,motor_silo1_logic);
-        silo1_logic_timer = micros();
-      }
+      motor_silo1_logic = !motor_silo1_logic;
+      digitalWrite(X_STEP_pin,motor_silo1_logic);
+      silo1_logic_timer = micros();
     }
     switch(silo1_state)
     {
@@ -74,17 +71,15 @@ void loop()
         }
         break;
       }
-
-      case 1:     // stop roller for 50 ms
+      case 1:
       {
-        if (millis() - silo1_timer >= 50)
+        if (millis() - silo1_timer >= 100)
         {
           silo1_timer = millis();
           silo1_state = 2;
         }
         break;
       }
-
       case 2:
       {
         if (millis() - silo1_timer >= rolling_constant)
@@ -95,9 +90,9 @@ void loop()
           }
         break;
       }
-      case 3:     // stop roller for 50 ms
+      case 3:
       {
-        if (millis() - silo1_timer >= 50)
+        if (millis() - silo1_timer >= 100)
         {
           silo1_timer = millis();
           silo1_state = 0;
@@ -109,7 +104,7 @@ void loop()
         silo1_state = 0;
         run_silo1 = false;
       }
-    }    
+    }
   }
   //======== run roller under silo2 ==============
   if(run_silo2)
@@ -180,9 +175,9 @@ void loop()
     {
       case 0:
       {
-        digitalWrite(Z_DIR_pin,HIGH);
         if (millis() - silo3_timer >= rolling_constant)
         {
+          digitalWrite(Z_DIR_pin,HIGH);
           silo3_timer = millis();
           silo3_state = 1;
         }
@@ -190,7 +185,7 @@ void loop()
       }
       case 1:
       {
-        if (millis() - silo3_timer >= 50)
+        if (millis() - silo3_timer >= 100)
         {
           silo3_timer = millis();
           silo3_state = 2;
@@ -209,7 +204,7 @@ void loop()
       }
       case 3:
       {
-        if (millis() - silo3_timer >= 50)
+        if (millis() - silo3_timer >= 100)
         {
           silo3_timer = millis();
           silo3_state = 0;
@@ -218,7 +213,8 @@ void loop()
       }
       default:
       {
-
+        silo3_state = 0;
+        run_silo3 = false;
       }
     }
   }
@@ -295,7 +291,7 @@ void check_message(void)
 
 void execute_command(void)
 {
-  mySerial.println(cmd);
+  //mySerial.println(cmd);
   if (cmd[0] == node_ID)
   {
     switch(cmd[1])
@@ -309,7 +305,7 @@ void execute_command(void)
         run_silo3 = false;
         run_silo4 = false;
         silo1_timer = millis();
-        digitalWrite(EN_pin,LOW);
+        //digitalWrite(EN_pin,LOW);
         break;
       }
       case '2':
@@ -321,7 +317,7 @@ void execute_command(void)
         run_silo3 = false;
         run_silo4 = false;
         silo2_timer = millis();
-        digitalWrite(EN_pin,LOW);
+        //digitalWrite(EN_pin,LOW);
         break;
       }
       case '3':
@@ -332,7 +328,7 @@ void execute_command(void)
         run_silo3 = true;
         run_silo4 = false;
         silo3_timer = millis();
-        digitalWrite(EN_pin,LOW);
+        //digitalWrite(EN_pin,LOW);
         break;
       }
       case '4':
@@ -344,7 +340,7 @@ void execute_command(void)
         run_silo3 = false;
         run_silo4 = true;
         silo4_timer = millis();
-        digitalWrite(EN_pin,LOW);
+       // digitalWrite(EN_pin,LOW);
         break;
       }
       default:
@@ -353,7 +349,7 @@ void execute_command(void)
         run_silo2 = false;
         run_silo3 = false;
         run_silo4 = false;
-        digitalWrite(EN_pin,HIGH);
+        //digitalWrite(EN_pin,HIGH);
       }
     }
   }

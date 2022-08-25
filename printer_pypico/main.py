@@ -98,7 +98,7 @@ debugging_timer = 0
 debugging_state = 0
 # ============ read parameters from text ==========
 
-device_link = UART(0, baudrate=115200, bits=8, parity=None, stop=1,tx=Pin(0), rx=Pin(1),timeout=1000)
+device_link = UART(0, baudrate=9600, bits=8, parity=None, stop=1,tx=Pin(0), rx=Pin(1),timeout=1000)
 device_link.read()                                                                     # clear data in serial port buffer
 
 motor1_controller = rp2.StateMachine(0, run_motor1, freq=20000, set_base=Pin(13))      # GPIO13 => pulse, GPIO12 => direction

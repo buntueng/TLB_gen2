@@ -1,7 +1,6 @@
 from machine import Pin, UART, I2C, reset
 import time
 import bme280
-import dht
 import rp2
 
 device_id = '1'
@@ -43,7 +42,7 @@ drop_solenoid_pin = Pin(27,Pin.OUT)
 rolling_solenoid_pin = Pin(28,Pin.OUT)
 
 
-dht_sensor = dht.DHT11(Pin(6)) 
+#dht_sensor = dht.DHT11(Pin(6)) 
 bmp_link=I2C(1,sda=Pin(2), scl=Pin(3), freq=400000)    #initializing the I2C to bmp
 pc_link = UART(0, baudrate=115200, bits=8, parity=None, stop=1,tx=Pin(0), rx=Pin(1),timeout=1000)
 device_link = UART(1, baudrate=115200, bits=8, parity=None, stop=1,tx=Pin(4), rx=Pin(5),timeout=1000)

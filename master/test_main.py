@@ -1,9 +1,5 @@
-from machine import Pin, UART, I2C, reset
+from machine import Pin, UART, reset
 import time
-<<<<<<< HEAD
-import bme280
-=======
->>>>>>> 32b92d3c5cb4e56cf7379357ce9c15ec68f29bef
 import rp2
 
 device_id = '1'
@@ -27,6 +23,10 @@ present_silo = '0'
 run_main_state = False
 main_state = 0
 
+move_origin = True
+move_origin_state = 0
+move_origin_timer = 0
+
 rolling_motor_dir_pin = Pin(19,Pin.OUT)
 sliding_motor_dir_pin = Pin(17,Pin.OUT)
 prox1_pin = Pin(10,Pin.IN)
@@ -45,12 +45,6 @@ lock_solenoid_pin = Pin(26,Pin.OUT)
 drop_solenoid_pin = Pin(27,Pin.OUT)
 rolling_solenoid_pin = Pin(28,Pin.OUT)
 
-<<<<<<< HEAD
-
-#dht_sensor = dht.DHT11(Pin(6)) 
-bmp_link=I2C(1,sda=Pin(2), scl=Pin(3), freq=400000)    #initializing the I2C to bmp
-=======
->>>>>>> 32b92d3c5cb4e56cf7379357ce9c15ec68f29bef
 pc_link = UART(0, baudrate=115200, bits=8, parity=None, stop=1,tx=Pin(0), rx=Pin(1),timeout=1000)
 device_link = UART(1, baudrate=9600, bits=8, parity=None, stop=1,tx=Pin(4), rx=Pin(5),timeout=1000)
 
@@ -167,6 +161,10 @@ rolling_motor.active(0)
 sliding_motor.active(0)
 rolling_motor_dir_pin.value(1)
 initial_io()
+# move sliding motor to origin
+set_sliding_backward()
+move_origin = True
+move_origin_state = 0
 
 while True:
     # get proximeter sensors
@@ -182,6 +180,47 @@ while True:
         pc_response(pc_resp_message) 
         device_resp_message = ""  
 
+    # ===== move sliding motor to origin ========
+    if move_origin:
+        if move_origin_state == 0:
+            if front_and_back_limit_pin.value() == 0:
+                move_origin_state = 100
+                move_origin = False
+                sliding_motor.active(0)
+            else:
+                move_origin_state = 1
+                set_sliding_backward()
+                sliding_motor.active(1)
+                move_origin_timer = time.ticks_ms()
+        elif move_origin_state == 1:
+            if front_and_back_limit_pin.value() == 0:
+                move_origin_state = 100
+                move_origin = False
+                sliding_motor.active(0)
+            else:
+                if time.ticks_ms() - move_origin_timer >= 3000:
+                    move_origin_state = 102
+                    move_origin = False
+                    sliding_motor.active(0)
+                else:
+                    if box_location == 1:
+                        move_origin_state = 2
+                        move_origin = False
+                        sliding_motor.active(0)
+                    elif box_location == 0:
+                        move_origin_state = 101
+                        move_origin = False
+                        sliding_motor.active(0)
+                    else:
+                        pass
+        elif move_origin_state == 2:                    # sliding motor is origin
+            pass
+        elif move_origin_state == 100:                  # sliding motor hits limit switch
+            pass
+        elif move_origin_state == 101:                  # prox sensor error
+            pass
+        elif move_origin_state == 102:                  # sliding motor can not run
+            pass
     # =========== command from pc ============
     if(pc_link.any()):
         try:
@@ -196,8 +235,8 @@ while True:
             pc_command = ""
     # =========== response from slaves ============
     if(device_link.any()):
-        device_resp = ""
         try:
+            device_resp = ""
             device_resp = device_link.read(1)
             device_resp = device_resp.decode()
             if device_resp == '\n':
@@ -208,7 +247,6 @@ while True:
             device_resp_message = ""
             resp_flag = False
         
-
     if execute_flag==True:
         # check command
         if len(pc_command) > 0:
@@ -270,7 +308,6 @@ while True:
                         pc_response(resp_message=message)
             else:
                 if pc_command[0] <= '9':
-                    print("message to other node")
                     # other send commad to slaves
                     device_message = pc_command + "\n"
                     device_link.write(bytes( ord(ch) for ch in device_message))

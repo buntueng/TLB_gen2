@@ -27,6 +27,8 @@ move_origin = True
 move_origin_state = 0
 move_origin_timer = 0
 
+fast_sliding_motor = True
+
 rolling_motor_dir_pin = Pin(19,Pin.OUT)
 sliding_motor_dir_pin = Pin(17,Pin.OUT)
 prox1_pin = Pin(10,Pin.IN)
@@ -155,10 +157,12 @@ def run_sliding_motor():
     nop()
     wrap()
 
-sliding_motor = rp2.StateMachine(0, run_roller_motor, freq=70000, set_base=Pin(16))      # GPIO16 => pulse, GPIO17 => direction
-rolling_motor = rp2.StateMachine(1, run_sliding_motor, freq=70000, set_base=Pin(18))      # GPIO18 => pulse, GPIO19 => direction
+sliding_motor = rp2.StateMachine(0, run_sliding_motor, freq=70000, set_base=Pin(16))      # GPIO16 => pulse, GPIO17 => direction
+rolling_motor = rp2.StateMachine(1, run_roller_motor, freq=70000, set_base=Pin(18))      # GPIO18 => pulse, GPIO19 => direction
+sliding_motor1 = rp2.StateMachine(2, run_sliding_motor, freq=50000, set_base=Pin(16))      # GPIO16 => pulse, GPIO17 => direction
 rolling_motor.active(0)
 sliding_motor.active(0)
+sliding_motor1.active(0)
 rolling_motor_dir_pin.value(1)
 initial_io()
 # move sliding motor to origin
@@ -272,6 +276,11 @@ while True:
                         pc_response(resp_message=message)
                         tube_drop_status = False
                         sticker_detect_status = False
+                    elif pc_command[1] == 'o':                                          # move sliding motor to origin
+                        move_origin_state = 0
+                        move_origin = True
+                        message = "Go origin"
+                        pc_response(resp_message=message)
                 elif len(pc_command) == 3:
                     if pc_command[1] == 'd':
                         message = ""
@@ -317,254 +326,258 @@ while True:
 
     
     
-    # if run_main_state:
-    #     #======== check prox sensor ======
-    #     if box_location == 0:
-    #         main_state = 202
-    #         sliding_motor.active(0)         # stop sliding motor
-    #         off_solenoid1()
-    #         off_solenoid2()
-    #         off_solenoid3()
-    #     #======== check limit_switch=======
-    #     if front_and_back_limit_pin.value() == 0:
-    #         main_state = 203
-    #         sliding_motor.active(0)         # stop sliding motor
-    #         off_solenoid1()
-    #         off_solenoid2()
-    #         off_solenoid3()
-    #     # ======= check sticker detect =====
-    #     if sticker_detect_pin.value() == 0:
-    #         sticker_detect_status = True
-    #     try:
-    #         if main_state == 0:
-    #             set_sliding_forward()
-    #             main_state_timer = time.ticks_ms()
-    #             printer_retry = 0
-    #             run_printer_controller()
-    #             main_state = 1
-    #         elif main_state == 1:
-    #             if time.ticks_ms() - main_state_timer >= 20:                # wait 20 ms
-    #                 main_state = 2
-    #             if printer_retry >= 5:
-    #                 main_state = 200
-    #         elif main_state == 2:
-    #             if resp_flag:
-    #                 print(resp_message)
-    #                 if resp_message[0:2] == '3OK':
-    #                     main_state =3
-    #                 resp_flag = False
-    #                 resp_message = ""
-    #             else:
-    #                 main_state = 1
-    #                 main_state_timer = time.ticks_ms()
-    #                 printer_retry = printer_retry + 1
-    #         elif main_state == 3:
-    #             if box_location == 1:
-    #                 main_state = 4
-    #                 sliding_motor.active(1)
-    #             else:
-    #                 main_state = 201                
-    #         elif main_state == 4:
-    #             if present_silo == 1:
-    #                 main_state = 11
-    #                 sliding_motor.active(0)
-    #             else:
-    #                 if box_location == 5:
-    #                     main_state = 5
-    #         elif main_state == 5:
-    #             if box_location == 2:
-    #                 main_state = 6
-    #         elif main_state == 6:
-    #             if present_silo == 2:
-    #                 main_state = 11
-    #                 sliding_motor.active(0)
-    #             else:
-    #                 if box_location == 5:
-    #                     main_state = 7
-    #         elif main_state == 7:
-    #             if box_location == 3:
-    #                 main_state = 8
-    #         elif main_state == 8:
-    #             if present_silo == 3:
-    #                 main_state =11
-    #                 sliding_motor.active(0)
-    #             else:
-    #                 if box_location == 5:
-    #                     main_state = 9
-    #         elif main_state == 9:
-    #             if box_location == 4:
-    #                 main_state = 10
-    #         elif main_state == 10:
-    #             if present_silo == 4:
-    #                 main_state = 11
-    #                 sliding_motor.active(0)
-    #         elif main_state == 11:
-    #             main_state_timer = time.ticks_ms()
-    #             silo_retry = 0
-    #             run_silo(present_silo)
-    #             main_state = 12
-    #             sliding_motor.active(0)
-    #             tube_drop_status = False
-    #         elif main_state == 12:
-    #             if time.ticks_ms()-main_state_timer>= 20:
-    #                 main_state = 13
-    #         elif main_state == 13:
-    #             if resp_flag:
-    #                 if resp_message[0:2] == '3OK':
-    #                     main_state = 14
-    #                     main_state_timer = time.ticks_ms()
-    #                 resp_flag = False
-    #                 resp_message = ""
-    #             else:
-    #                 if silo_retry >= 5:
-    #                     main_state = 204
-    #                 else:
-    #                     silo_retry = silo_retry + 1
-    #                     main_state = 12
-    #                     main_state_timer = time.ticks_ms()
-    #         elif main_state == 14:
-    #             if time.ticks_ms() - main_state_timer >= 5000:
-    #                 stop_silo()
-    #                 main_state = 205
-    #             else:
-    #                 if tube_drop_status:
-    #                     main_state_timer = time.ticks_ms()
-    #                     main_state = 15
-    #                     tube_drop_status = False
-    #         elif main_state == 15:
-    #             if time.ticks_ms() - main_state_timer >= 200:
-    #                 on_solenoid1()
-    #                 main_state_timer = time.ticks_ms()
-    #                 sticker_detect_status = False
-    #                 main_state = 16
-    #         elif main_state == 16:
-    #             if time.ticks_ms() - main_state_timer >= 200:
-    #                 off_solenoid1()
-    #                 main_state = 17
-    #         elif main_state == 17:
-    #             if sticker_detect_status:
-    #                 on_solenoid2()
-    #                 main_state_timer = time.ticks_ms()
-    #                 main_state = 18
-    #             else:
-    #                 main_state = 19
-    #         elif main_state == 18:
-    #             if time.ticks_ms()-main_state_timer >=500:
-    #                 off_solenoid2()
-    #                 main_state = 19
-    #         elif main_state == 19:
-    #             sliding_motor.active(1)
-    #             if present_silo == 1:
-    #                 main_state = 20
-    #             elif present_silo == 2:
-    #                 main_state = 21
-    #             elif present_silo == 3:
-    #                 main_state = 23
-    #             elif present_silo == 4:
-    #                 main_state = 25
-    #         elif main_state == 20:
-    #             if box_location == 5:
-    #                 main_state = 21
-    #         elif main_state == 21:
-    #             if box_location == 2:
-    #                 main_state = 22
-    #         elif main_state == 22:
-    #             if box_location == 5:
-    #                 main_state = 23
-    #         elif main_state == 23:
-    #             if box_location == 3:
-    #                 main_state = 24
-    #         elif main_state == 24:
-    #             if box_location == 5:
-    #                 main_state = 25
-    #         elif main_state == 25:
-    #             if box_location == 4:
-    #                 main_state = 26
-    #         elif main_state == 26:
-    #             sliding_motor.active(0)
-    #             rolling_motor.active(1)
-    #             check_printer_state()
-    #             check_printer_state_counter = 0
-    #             main_state_timer = time.ticks_ms()
-    #             main_state = 27
-    #         elif main_state == 27:
-    #             if time.ticks_ms() - main_state_timer >= 20:
-    #                 main_state = 28
-    #         elif main_state == 28:
-    #             if resp_flag:
-    #                 if resp_message[0:1] == '3C':
-    #                     main_state = 29
-    #                 resp_message = ""
-    #                 resp_flag = False
-    #             else:
-    #                 if check_printer_state_counter >= 5:
-    #                     main_state = 206
-    #                 else:
-    #                     check_printer_state_counter = check_printer_state_counter + 1
-    #                     main_state_timer = time.ticks_ms()
-    #                     main_state = 27
-    #         elif main_state == 29:
-    #             # run sliding motor in second speed
-    #             sliding_motor.active(1)
-    #             main_state = 30
-    #         elif main_state == 30:
-    #             if roller_limit_pin.value() == 0:
-    #                 sliding_motor.active(0)
-    #                 set_sliding_backward()
-    #                 main_state_timer = time.ticks_ms()
-    #                 main_state = 31
-    #         elif main_state == 31:
-    #             if time.ticks_ms()-main_state_timer >= 800:
-    #                 sliding_motor.active(1)
-    #                 main_state_timer = time.ticks_ms()
-    #                 main_state = 32
-    #         elif main_state == 32:
-    #             if time.ticks_ms() - main_state_timer >= 100:
-    #                 on_solenoid1()
-    #                 on_solenoid3()
-    #                 main_state_timer = time.ticks_ms()
-    #                 main_state = 33
-    #         elif main_state == 33:
-    #             if time.ticks_ms() - main_state_timer >= 100:
-    #                 off_solenoid1()
-    #                 off_solenoid3()
-    #                 main_state = 34
-    #         elif main_state == 34:
-    #             if box_location == 4:
-    #                 main_state = 35
-    #         elif main_state == 35:
-    #             if box_location == 5:
-    #                 main_state = 36
-    #         elif main_state == 36:
-    #             if box_location == 3:
-    #                 main_state = 37
-    #         elif main_state == 37:
-    #             if box_location == 5:
-    #                 main_state = 38
-    #         elif main_state == 38:
-    #             if box_location == 2:
-    #                 main_state = 39
-    #         elif main_state == 39:
-    #             if box_location == 5:
-    #                 main_state = 40
-    #         elif main_state == 40:
-    #             if box_location == 1:
-    #                 sliding_motor.active(0)
-    #                 set_sliding_forward()
-    #                 main_state = 41
-    #         elif main_state == 41:
-    #             pass
-    #     except:
-    #         main_state = 207
-    #     # ============= error states =========
-    #     #main_state == 200:             # printer module not response
-    #     #main_state == 201:             # sliding box position is not origin
-    #     #main_state == 202:             # prox sensor error
-    #     #main_state == 203:             # sliding motor run to front limit switch
-    #     #main_state == 204:             # silo module not response
-    #     #main_state == 205:             # blood tube is jamming
-    #     #main_state == 206:             # printer module not response
-    #     #main_state == 207              # there is an error from try condition
+    if run_main_state:
+        #======== check prox sensor ======
+        if box_location == 0:
+            main_state = 202
+            sliding_motor.active(0)         # stop sliding motor
+            sliding_motor1.active(0)
+            off_solenoid1()
+            off_solenoid2()
+            off_solenoid3()
+        #======== check limit_switch=======
+        if front_and_back_limit_pin.value() == 0:
+            main_state = 203
+            sliding_motor.active(0)         # stop sliding motor
+            sliding_motor1.active(0)
+            off_solenoid1()
+            off_solenoid2()
+            off_solenoid3()
+        # ======= check sticker detect =====
+        if sticker_detect_pin.value() == 0:
+            sticker_detect_status = True
+        try:
+            if main_state == 0:
+                set_sliding_forward()
+                main_state_timer = time.ticks_ms()
+                printer_retry = 0
+                run_printer_controller()
+                main_state = 1
+            elif main_state == 1:
+                if time.ticks_ms() - main_state_timer >= 20:                # wait 20 ms
+                    main_state = 2
+                if printer_retry >= 5:
+                    main_state = 200
+            elif main_state == 2:
+                if resp_flag:
+                    if len(device_resp_message) >= 2:
+                        if device_resp_message[0:2] == '3OK':
+                            main_state =3
+                    resp_flag = False
+                    device_resp_message = ""
+                else:
+                    main_state = 1
+                    main_state_timer = time.ticks_ms()
+                    printer_retry = printer_retry + 1
+            elif main_state == 3:
+                if box_location == 1:
+                    main_state = 4
+                    sliding_motor.active(1)
+                else:
+                    main_state = 201                
+            elif main_state == 4:
+                if present_silo == 1:
+                    main_state = 11
+                    sliding_motor.active(0)
+                else:
+                    if box_location == 5:
+                        main_state = 5
+            elif main_state == 5:
+                if box_location == 2:
+                    main_state = 6
+            elif main_state == 6:
+                if present_silo == 2:
+                    main_state = 11
+                    sliding_motor.active(0)
+                else:
+                    if box_location == 5:
+                        main_state = 7
+            elif main_state == 7:
+                if box_location == 3:
+                    main_state = 8
+            elif main_state == 8:
+                if present_silo == 3:
+                    main_state =11
+                    sliding_motor.active(0)
+                else:
+                    if box_location == 5:
+                        main_state = 9
+            elif main_state == 9:
+                if box_location == 4:
+                    main_state = 10
+            elif main_state == 10:
+                if present_silo == 4:
+                    main_state = 11
+                    sliding_motor.active(0)
+            elif main_state == 11:
+                main_state_timer = time.ticks_ms()
+                silo_retry = 0
+                run_silo(present_silo)
+                main_state = 12
+                sliding_motor.active(0)
+                tube_drop_status = False
+            elif main_state == 12:
+                if time.ticks_ms()-main_state_timer>= 20:
+                    main_state = 13
+            elif main_state == 13:
+                if resp_flag:
+                    if len(device_resp_message) >= 3:
+                        if device_resp_message[0:2] == '3OK':
+                            main_state = 14
+                            main_state_timer = time.ticks_ms()
+                    resp_flag = False
+                    device_resp_message = ""
+                else:
+                    if silo_retry >= 5:
+                        main_state = 204
+                    else:
+                        silo_retry = silo_retry + 1
+                        main_state = 12
+                        main_state_timer = time.ticks_ms()
+            elif main_state == 14:
+                if time.ticks_ms() - main_state_timer >= 5000:
+                    stop_silo()
+                    main_state = 205
+                else:
+                    if tube_drop_status:
+                        main_state_timer = time.ticks_ms()
+                        main_state = 15
+                        tube_drop_status = False
+            elif main_state == 15:
+                if time.ticks_ms() - main_state_timer >= 200:
+                    on_solenoid1()
+                    main_state_timer = time.ticks_ms()
+                    sticker_detect_status = False
+                    main_state = 16
+            elif main_state == 16:
+                if time.ticks_ms() - main_state_timer >= 200:
+                    off_solenoid1()
+                    main_state = 17
+            elif main_state == 17:
+                if sticker_detect_status:
+                    on_solenoid2()
+                    main_state_timer = time.ticks_ms()
+                    main_state = 18
+                else:
+                    main_state = 19
+            elif main_state == 18:
+                if time.ticks_ms()-main_state_timer >=500:
+                    off_solenoid2()
+                    main_state = 19
+            elif main_state == 19:
+                sliding_motor.active(1)
+                if present_silo == 1:
+                    main_state = 20
+                elif present_silo == 2:
+                    main_state = 21
+                elif present_silo == 3:
+                    main_state = 23
+                elif present_silo == 4:
+                    main_state = 25
+            elif main_state == 20:
+                if box_location == 5:
+                    main_state = 21
+            elif main_state == 21:
+                if box_location == 2:
+                    main_state = 22
+            elif main_state == 22:
+                if box_location == 5:
+                    main_state = 23
+            elif main_state == 23:
+                if box_location == 3:
+                    main_state = 24
+            elif main_state == 24:
+                if box_location == 5:
+                    main_state = 25
+            elif main_state == 25:
+                if box_location == 4:
+                    main_state = 26
+            elif main_state == 26:
+                sliding_motor.active(0)
+                rolling_motor.active(1)
+                check_printer_state()
+                check_printer_state_counter = 0
+                main_state_timer = time.ticks_ms()
+                main_state = 27
+            elif main_state == 27:
+                if time.ticks_ms() - main_state_timer >= 20:
+                    main_state = 28
+            elif main_state == 28:
+                if resp_flag:
+                    if len(device_resp_message) >= 2:
+                        if resp_message[0:1] == '3C':
+                            main_state = 29
+                    device_resp_message = ""
+                    resp_flag = False
+                else:
+                    if check_printer_state_counter >= 5:
+                        main_state = 206
+                    else:
+                        check_printer_state_counter = check_printer_state_counter + 1
+                        main_state_timer = time.ticks_ms()
+                        main_state = 27
+            elif main_state == 29:
+                # run sliding motor in second speed
+                sliding_motor1.active(1)
+                main_state = 30
+            elif main_state == 30:
+                if roller_limit_pin.value() == 0:
+                    sliding_motor1.active(0)
+                    set_sliding_backward()
+                    main_state_timer = time.ticks_ms()
+                    main_state = 31
+            elif main_state == 31:
+                if time.ticks_ms()-main_state_timer >= 800:
+                    sliding_motor.active(1)
+                    main_state_timer = time.ticks_ms()
+                    main_state = 32
+            elif main_state == 32:
+                if time.ticks_ms() - main_state_timer >= 100:
+                    on_solenoid1()
+                    on_solenoid3()
+                    main_state_timer = time.ticks_ms()
+                    main_state = 33
+            elif main_state == 33:
+                if time.ticks_ms() - main_state_timer >= 100:
+                    off_solenoid1()
+                    off_solenoid3()
+                    main_state = 34
+            elif main_state == 34:
+                if box_location == 4:
+                    main_state = 35
+            elif main_state == 35:
+                if box_location == 5:
+                    main_state = 36
+            elif main_state == 36:
+                if box_location == 3:
+                    main_state = 37
+            elif main_state == 37:
+                if box_location == 5:
+                    main_state = 38
+            elif main_state == 38:
+                if box_location == 2:
+                    main_state = 39
+            elif main_state == 39:
+                if box_location == 5:
+                    main_state = 40
+            elif main_state == 40:
+                if box_location == 1:
+                    sliding_motor.active(0)
+                    set_sliding_forward()
+                    main_state = 41
+            elif main_state == 41:
+                pass
+        except:
+            main_state = 207
+        # ============= error states =========
+        #main_state == 200:             # printer module not response
+        #main_state == 201:             # sliding box position is not origin
+        #main_state == 202:             # prox sensor error
+        #main_state == 203:             # sliding motor run to front limit switch
+        #main_state == 204:             # silo module not response
+        #main_state == 205:             # blood tube is jamming
+        #main_state == 206:             # printer module not response
+        #main_state == 207:              # there is an error from try condition
 
 
 

@@ -1,12 +1,12 @@
 #include<main.hpp>
-char node_ID = '1';
+char node_ID = '2';
 SoftwareSerial mySerial (rxPin, txPin);
 bool exe_cmd_status = false;
 String cmd = "";
 
 // ========== defined roller speed and time rolling constant =========
-const int rolling_time = 2000;            // 20 micro seconds
-const int rolling_constant = 2000;
+const int rolling_time = 2000;              // 2000 micro seconds
+const int rolling_constant = 1500;        // time to rolling forward or backward
 // ========== silo control bits =====
 bool run_silo1 = false;
 int silo1_state = 0;
@@ -66,18 +66,18 @@ void loop()
     {
       case 0:
       {
-        digitalWrite(X_DIR_pin,HIGH);
         if (millis() - silo1_timer >= rolling_constant)
         {
+          digitalWrite(X_DIR_pin,HIGH);
           silo1_timer = millis();
           silo1_state = 1;
         }
         break;
       }
 
-      case 1:
+      case 1:     // stop roller for 50 ms
       {
-        if (millis() - silo1_timer >= 100)
+        if (millis() - silo1_timer >= 50)
         {
           silo1_timer = millis();
           silo1_state = 2;
@@ -87,17 +87,17 @@ void loop()
 
       case 2:
       {
-        digitalWrite(X_DIR_pin,LOW);
         if (millis() - silo1_timer >= rolling_constant)
           {
+            digitalWrite(X_DIR_pin,LOW);
             silo1_timer = millis();
             silo1_state = 3;
           }
         break;
       }
-      case 3:
+      case 3:     // stop roller for 50 ms
       {
-        if (millis() - silo1_timer >= 100)
+        if (millis() - silo1_timer >= 50)
         {
           silo1_timer = millis();
           silo1_state = 0;
@@ -120,26 +120,54 @@ void loop()
       digitalWrite(Y_STEP_pin,motor_silo2_logic);
       silo2_logic_timer = micros();
     }
-    if(silo2_state)
+    switch(silo2_state)
     {
-      digitalWrite(Y_DIR_pin,HIGH);
-      if (millis() - silo2_timer >= rolling_constant)
+      case 0:
       {
-        silo2_timer = millis();
-        silo2_state = 1;
+        if (millis() - silo2_timer >= rolling_constant)
+        {
+          digitalWrite(Y_DIR_pin,HIGH);
+          silo2_timer = millis();
+          silo2_state = 1;
+        }
+        break;
+      }
+      case 1:
+      {
+        if (millis() - silo2_timer >= 50)
+        {
+          silo2_state = 2;
+          silo2_timer = millis();
+        }
+        break;
+      }
+      case 2:
+      {
+        if (millis() - silo2_timer >= rolling_constant)
+          {
+            digitalWrite(Y_DIR_pin,LOW);
+            silo2_timer = millis();
+            silo2_state = 3;
+          }
+        break;
+      }
+      case 3:
+      {
+        if (millis() - silo2_timer >= 50)
+        {
+          silo2_state = 0;
+          silo2_timer = millis();
+        }
+        break;
+      }
+      default:
+      {
+        silo2_state = 0;
+        run_silo2 = false;
       }
     }
-    else
-    {
-      digitalWrite(Y_DIR_pin,LOW);
-      if (millis() - silo2_timer >= rolling_constant)
-        {
-          silo2_timer = millis();
-          silo2_state = 0;
-        }
-    }
   }
-        
+  //======== run roller under silo3 ==============   
   if(run_silo3)
   {
     if (micros()-silo3_logic_timer>=rolling_time)
@@ -148,26 +176,53 @@ void loop()
       digitalWrite(Z_STEP_pin,motor_silo3_logic);
       silo3_logic_timer = micros();
     }
-    if(silo3_state)
+    switch(silo3_state)
     {
-      digitalWrite(Z_DIR_pin,HIGH);
-      if (millis() - silo3_timer >= rolling_constant)
+      case 0:
       {
-        silo3_timer = millis();
-        silo3_state = 1;
+        digitalWrite(Z_DIR_pin,HIGH);
+        if (millis() - silo3_timer >= rolling_constant)
+        {
+          silo3_timer = millis();
+          silo3_state = 1;
+        }
+        break;
       }
-    }
-    else
-    {
-      digitalWrite(Z_DIR_pin,LOW);
-      if (millis() - silo3_timer >= rolling_constant)
+      case 1:
+      {
+        if (millis() - silo3_timer >= 50)
+        {
+          silo3_timer = millis();
+          silo3_state = 2;
+        }
+        break;
+      }
+      case 2:
+      {
+        if (millis() - silo3_timer >= rolling_constant)
+          {
+            digitalWrite(Z_DIR_pin,LOW);
+            silo3_timer = millis();
+            silo3_state = 3;
+          }
+        break;
+      }
+      case 3:
+      {
+        if (millis() - silo3_timer >= 50)
         {
           silo3_timer = millis();
           silo3_state = 0;
         }
+        break;
+      }
+      default:
+      {
+
+      }
     }
   }
-
+  //======== run roller under silo4 ==============
   if(run_silo4)
   {
     if (micros()-silo4_logic_timer>=rolling_time)
@@ -176,23 +231,51 @@ void loop()
       digitalWrite(A_STEP_pin,motor_silo4_logic);
       silo4_logic_timer = micros();
     }
-    if(silo4_state)
+    switch(silo4_state)
     {
-      digitalWrite(A_DIR_pin,HIGH);
-      if (millis() - silo4_timer >= rolling_constant)
+      case 0:
       {
-        silo4_timer = millis();
-        silo4_state = 1;
-      }
-    }
-    else
-    {
-      digitalWrite(A_DIR_pin,LOW);
-      if (millis() - silo4_timer >= rolling_constant)
+        if (millis() - silo4_timer >= rolling_constant)
         {
+          digitalWrite(A_DIR_pin,HIGH);
           silo4_timer = millis();
-          silo4_state = 0;
+          silo4_state = 1;
         }
+        break;
+      }
+      case 1:
+      {
+        if(millis()-silo4_timer >= 50)
+        {
+          silo4_state = 2;
+          silo4_timer = millis();
+        }
+        break;
+      }
+      case 2:
+      {
+        if (millis() - silo4_timer >= rolling_constant)
+          {
+            digitalWrite(A_DIR_pin,LOW);
+            silo4_timer = millis();
+            silo4_state = 3;
+          }
+        break;
+      }
+      case 3:
+      {
+        if(millis()-silo4_timer >= 50)
+        {
+          silo4_state = 0;
+          silo4_timer = millis();
+        }
+        break;
+      }
+      default:
+      {
+        silo4_state = 0;
+        run_silo4 = false;
+      }
     }
   }
 }

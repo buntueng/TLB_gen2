@@ -5,8 +5,9 @@ bool exe_cmd_status = false;
 String cmd = "";
 
 // ========== defined roller speed and time rolling constant =========
-const int rolling_time = 3000;              // 2000 micro seconds
+const int rolling_time = 200;              // 2000 micro seconds
 const int rolling_constant = 1500;        // time to rolling forward or backward
+const int rolling_constant2 = 200;
 // ========== silo control bits =====
 bool run_silo1 = false;
 int silo1_state = 0;
@@ -65,7 +66,7 @@ void loop()
       {
         if (millis() - silo1_timer >= rolling_constant)
         {
-          digitalWrite(X_DIR_pin,HIGH);
+          digitalWrite(X_DIR_pin,LOW);
           silo1_timer = millis();
           silo1_state = 1;
         }
@@ -82,9 +83,9 @@ void loop()
       }
       case 2:
       {
-        if (millis() - silo1_timer >= rolling_constant)
+        if (millis() - silo1_timer >= rolling_constant2)
           {
-            digitalWrite(X_DIR_pin,LOW);
+            digitalWrite(X_DIR_pin,HIGH);
             silo1_timer = millis();
             silo1_state = 3;
           }
@@ -109,7 +110,7 @@ void loop()
   //======== run roller under silo2 ==============
   if(run_silo2)
   {
-    if (micros()-silo2_logic_timer>=rolling_time)
+    if (micros()-  silo2_logic_timer >= rolling_time)
     {
       motor_silo2_logic = !motor_silo2_logic;
       digitalWrite(Y_STEP_pin,motor_silo2_logic);
@@ -138,7 +139,7 @@ void loop()
       }
       case 2:
       {
-        if (millis() - silo2_timer >= rolling_constant)
+        if (millis() - silo2_timer >= rolling_constant2)
           {
             digitalWrite(Y_DIR_pin,LOW);
             silo2_timer = millis();
@@ -194,7 +195,7 @@ void loop()
       }
       case 2:
       {
-        if (millis() - silo3_timer >= rolling_constant)
+        if (millis() - silo3_timer >= rolling_constant2)
           {
             digitalWrite(Z_DIR_pin,LOW);
             silo3_timer = millis();
@@ -250,7 +251,7 @@ void loop()
       }
       case 2:
       {
-        if (millis() - silo4_timer >= rolling_constant)
+        if (millis() - silo4_timer >= rolling_constant2)
           {
             digitalWrite(A_DIR_pin,LOW);
             silo4_timer = millis();
@@ -369,4 +370,8 @@ void setup_ios(void)
   pinMode(Y_STEP_pin,OUTPUT);
   pinMode(Z_DIR_pin,OUTPUT);
   pinMode(Z_STEP_pin,OUTPUT);
+  digitalWrite(X_DIR_pin,HIGH);
+  digitalWrite(Y_DIR_pin,LOW);
+  digitalWrite(Z_DIR_pin,LOW);
+  digitalWrite(A_DIR_pin,LOW);
 }

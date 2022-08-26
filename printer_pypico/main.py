@@ -262,6 +262,8 @@ while True:
     elif printer_state == 4:                                            # === rolling paper
         if time.ticks_ms() - printer_state_timer >= 5000:               # === if switch not pressed within 5 seconds >> goto state 100
             printer_state = 100
+            motor1_controller.active(0)
+            motor2_controller.active(0)
         else:
             if duo_switch.value() == 1:
                 printer_state = 5

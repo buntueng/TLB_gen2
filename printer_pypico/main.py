@@ -104,39 +104,12 @@ device_link.read()                                                              
 motor1_controller = rp2.StateMachine(0, run_motor1, freq=20000, set_base=Pin(13))      # GPIO13 => pulse, GPIO12 => direction
 motor2_controller = rp2.StateMachine(1, run_motor2, freq=20000, set_base=Pin(15))      # GPIO15 => pulse, GPIO14 => direction
 #========== sub functions ==========
-def on_motor(motor_number):
-    if motor_number == 1:
-        motor1_controller.active(1)
-        motor2_controller.active(0)
-        motor3_controller.active(0)
-        motor4_controller.active(0)
-    elif motor_number == 2:
-        motor1_controller.active(0)
-        motor2_controller.active(1)
-        motor3_controller.active(0)
-        motor4_controller.active(0)
-    elif motor_number == 3:
-        motor1_controller.active(0)
-        motor2_controller.active(0)
-        motor3_controller.active(1)
-        motor4_controller.active(0)
-    elif motor_number == 4:
-        motor1_controller.active(0)
-        motor2_controller.active(0)
-        motor3_controller.active(0)
-        motor4_controller.active(1)
-    elif motor_number == 0:
-        pass
     
 def set_dir(motor_number,direction):
     if motor_number == 1:
         motor1_dir_pin.value(direction)
     elif motor_number == 2:
         motor2_dir_pin.value(direction)
-    elif motor_number == 3:
-        motor3_dir_pin.value(direction)
-    elif motor_number == 4:
-        motor4_dir_pin.value(direction)
     elif motor_number == 0:
         pass
 
@@ -182,6 +155,7 @@ while True:
             pass
 
     if execute_flag==True:
+        print(master_command)
         # check command
         if len(master_command) > 0:
             if master_command[0] == device_id:
@@ -202,12 +176,14 @@ while True:
                         resp_485(message=message)
                 elif master_command[1] == 'c':          # check printer operation
                     message = "Out of state"
-                    if printer_state == 7:
+                    if printer_state < 7:
+                        message = "Running"
+                    elif printer_state == 7:
                         message = "Complete"
                     elif printer_state == 100:
                         message = "check slap switch"
-
                     resp_485(message=message)
+                    print(message)
                 elif master_command[1] == 't':         # turnoff all motors
                     off_motor()
                     run_motor_flag = False

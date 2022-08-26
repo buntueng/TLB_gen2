@@ -298,7 +298,7 @@ void execute_command(void)
     {
       case '1':
       {
-        mySerial.println("Box1");
+        mySerial.println("2Box1");
         silo1_state = 0;
         run_silo1 = true;
         run_silo2 = false;
@@ -310,7 +310,7 @@ void execute_command(void)
       }
       case '2':
       {
-        mySerial.println("Box2");
+        mySerial.println("2Box2");
         silo2_state = 0;
         run_silo1 = false;
         run_silo2 = true;
@@ -322,7 +322,7 @@ void execute_command(void)
       }
       case '3':
       {
-        mySerial.println("Box3");
+        mySerial.println("2Box3");
         run_silo1 = false;
         run_silo2 = false;
         run_silo3 = true;
@@ -333,7 +333,7 @@ void execute_command(void)
       }
       case '4':
       {
-        mySerial.println("Box4");
+        mySerial.println("2Box4");
         silo4_state = 0;
         run_silo1 = false;
         run_silo2 = false;

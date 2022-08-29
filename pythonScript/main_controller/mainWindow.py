@@ -2,6 +2,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import serial
 import time
+from mysql.connector import connect
 
 class MainControllerApp:
     def __init__(self, master=None):
@@ -123,20 +124,30 @@ class MainControllerApp:
             self.comport_available = False
     
     def run_main_state(self):
+        next_loop_time = 100
         if self.main_state == 0:
             if self.comport_available == True:
                 self.main_state = 1
                 self.mainwindow.after(3000,self.run_main_state)             # wait 3 seconds for serial port is ready to send data
-        elif self.main_state == 1:  # try to send CMD through serial port        
-            try:                    
-                self.main_state = 2
-            except:
-                pass
+        elif self.main_state == 1:  # read CMD and send CMD through serial port    
+            present_cmd = self.read_print_cmd()
+            if len(present_cmd) > 0:
+                silo_number_string = present_cmd[0][0]
+                device_cmd = "1g" + silo_number_string
+                # send cmd here
+                try:
+                    pass
+                    self.main_state = 2
+                except:
+                    pass
+                
+
         elif self.main_state == 2:  # read response from serial port
             try:
                 pass
             except:
                 pass
+        self.toplevel1.after(next_loop_time,self.run_main_state)
         
 
     
@@ -149,6 +160,15 @@ class MainControllerApp:
                 else:
                     self.status_text.tag_add("even","{}.0".format(current_index+1), "{}.0+1lines".format(current_index+1))
 
+    #========= database manager ========================
+    def read_print_cmd(self):
+        db_connector =  connect(host="localhost", user="root", port = 3333, passwd="edgelabeling555",  db="sbj",  charset="utf8"  )
+        database_cursor = db_connector.cursor()
+        sql_query = 'SELECT command FROM print_command WHERE flag = "0" ORDER BY serial DESC LIMIT 1'
+        database_cursor.execute(sql_query)
+        result_list = database_cursor.fetchall()
+        db_connector.close()
+        return result_list
 
 if __name__ == '__main__':
     app = MainControllerApp()

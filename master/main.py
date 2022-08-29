@@ -542,7 +542,7 @@ while True:
                 main_state_timer = time.ticks_ms()
                 main_state = 27
             elif main_state == 27:
-                if time.ticks_ms() - main_state_timer >= 20:
+                if time.ticks_ms() - main_state_timer >= 200:
                     main_state = 28
             elif main_state == 28:
                 if resp_flag:
@@ -557,7 +557,7 @@ while True:
                     device_resp_message = ""
                     resp_flag = False
                 else:
-                    if check_printer_state_counter >= 5:
+                    if check_printer_state_counter >= 20:
                         main_state = 206
                         rolling_motor.active(0)
                     else:
@@ -597,6 +597,8 @@ while True:
             elif main_state == 34:
                 if box_location == 4:
                     main_state = 35
+                    # ====== clear printer state
+                    clear_printer_controller()
             elif main_state == 35:
                 if box_location == 5:
                     main_state = 36
@@ -617,6 +619,8 @@ while True:
                     sliding_motor.active(0)
                     set_sliding_forward()
                     main_state = 41
+                resp_flag = False
+                device_resp_message = ""
             elif main_state == 41:
                 pass
             
@@ -634,7 +638,7 @@ while True:
                     main_state_timer = time.ticks_ms()
                     main_state = 51
             elif main_state == 51:
-                if time.ticks_ms() - main_state_timer >= 10:
+                if time.ticks_ms() - main_state_timer >= 50:
                     main_state = 28
         except:
             main_state = 207

@@ -135,8 +135,10 @@ def check_running_state():
     message = ""
     if main_state == 0:
         message = "idle"
-    elif main_state > 0 and main_state < 40:
+    elif main_state > 0 and main_state < 33:
         message = "running"
+    elif main_state >= 33 and main_state < 41:
+        message = "back"
     elif main_state == 41:
         message = "complete"
     elif main_state == 21:
@@ -170,8 +172,8 @@ def run_sliding_motor_step2():
     nop()
     wrap()
 
-sliding_motor = rp2.StateMachine(0, run_sliding_motor, freq=70000, set_base=Pin(16))      # GPIO16 => pulse, GPIO17 => direction
-rolling_motor = rp2.StateMachine(1, run_roller_motor, freq=70000, set_base=Pin(18))      # GPIO18 => pulse, GPIO19 => direction
+sliding_motor = rp2.StateMachine(0, run_sliding_motor, freq=75000, set_base=Pin(16))      # GPIO16 => pulse, GPIO17 => direction
+rolling_motor = rp2.StateMachine(1, run_roller_motor, freq=75000, set_base=Pin(18))      # GPIO18 => pulse, GPIO19 => direction
 rolling_motor.active(0)
 sliding_motor.active(0)
 rolling_motor_dir_pin.value(1)
@@ -592,7 +594,7 @@ while True:
                     main_state_timer = time.ticks_ms()
                     main_state = 60
             elif main_state == 33:
-                if time.ticks_ms() - main_state_timer >= 500:
+                if time.ticks_ms() - main_state_timer >= 100:
                     off_solenoid1()
                     off_solenoid3()
                     sliding_motor.active(1)

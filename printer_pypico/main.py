@@ -70,7 +70,7 @@ try:
     if show_debug:
         print("init ok")
 except:
-    on_delay = 2000
+    on_delay = 200
     slap_up_time= 150
     wait_rolling_more_time = 100
     slap_down_time = 160

@@ -2,7 +2,7 @@ from machine import Pin, UART, reset
 import time
 import rp2
 
-show_debug = False
+show_debug = True
 
 device_id = '3'
 master_command = ""
@@ -70,7 +70,7 @@ try:
     if show_debug:
         print("init ok")
 except:
-    on_delay = 2000
+    on_delay = 200
     slap_up_time= 150
     wait_rolling_more_time = 100
     slap_down_time = 160

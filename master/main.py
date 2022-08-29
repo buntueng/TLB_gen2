@@ -133,13 +133,15 @@ def pc_response(resp_message):
 
 def check_running_state():
     message = ""
-    if running_state == 0:
+    if main_state == 0:
         message = "idle"
-    elif running_state > 0 and running_state < 20:
+    elif main_state > 0 and main_state < 33:
         message = "running"
-    elif running_state == 20:
+    elif main_state >= 33 and main_state < 41:
+        message = "back"
+    elif main_state == 41:
         message = "complete"
-    elif running_state == 21:
+    elif main_state == 21:
         message = "jam"
     return message + "\n"
 
@@ -170,8 +172,8 @@ def run_sliding_motor_step2():
     nop()
     wrap()
 
-sliding_motor = rp2.StateMachine(0, run_sliding_motor, freq=70000, set_base=Pin(16))      # GPIO16 => pulse, GPIO17 => direction
-rolling_motor = rp2.StateMachine(1, run_roller_motor, freq=70000, set_base=Pin(18))      # GPIO18 => pulse, GPIO19 => direction
+sliding_motor = rp2.StateMachine(0, run_sliding_motor, freq=75000, set_base=Pin(16))      # GPIO16 => pulse, GPIO17 => direction
+rolling_motor = rp2.StateMachine(1, run_roller_motor, freq=75000, set_base=Pin(18))      # GPIO18 => pulse, GPIO19 => direction
 rolling_motor.active(0)
 sliding_motor.active(0)
 rolling_motor_dir_pin.value(1)
@@ -283,7 +285,7 @@ while True:
                         reset() 
                     elif pc_command[1] == 'c':
                         message = check_running_state()
-                        message = str(main_state)
+                        #message = str(main_state)
                         pc_response(resp_message=message)
                     elif pc_command[1] == 'l':
                         message = str(box_location)
@@ -580,17 +582,19 @@ while True:
                 if time.ticks_ms()-main_state_timer >= 800:
                     sliding_motor.active(1)
                     rolling_motor.active(0)
+                    on_solenoid1()
+                    on_solenoid3()
                     main_state_timer = time.ticks_ms()
                     main_state = 32
             elif main_state == 32:
-                if time.ticks_ms() - main_state_timer >= 100:
-                    on_solenoid1()
-                    on_solenoid3()
+                if time.ticks_ms() - main_state_timer >= 50:
+                    # on_solenoid1()
+                    # on_solenoid3()
                     sliding_motor.active(0)
                     main_state_timer = time.ticks_ms()
                     main_state = 60
             elif main_state == 33:
-                if time.ticks_ms() - main_state_timer >= 500:
+                if time.ticks_ms() - main_state_timer >= 100:
                     off_solenoid1()
                     off_solenoid3()
                     sliding_motor.active(1)
@@ -626,10 +630,25 @@ while True:
                 pass
             
             elif main_state == 60:
-                if time.ticks_ms() - main_state_timer >= 500:
+                if time.ticks_ms() - main_state_timer >= 50:
                     main_state_timer = time.ticks_ms()
-                    main_state =33
-
+                    sliding_motor.active(1)
+                    main_state =61
+            elif main_state == 61:
+                if time.ticks_ms() - main_state_timer >= 50:
+                    sliding_motor.active(0)
+                    main_state_timer = time.ticks_ms()
+                    main_state = 62
+            elif main_state == 62:
+                if time.ticks_ms() - main_state_timer >= 50:
+                    main_state_timer = time.ticks_ms()
+                    sliding_motor.active(1)
+                    main_state =63
+            elif main_state == 63:
+                if time.ticks_ms() - main_state_timer >= 50:
+                    sliding_motor.active(0)
+                    main_state_timer = time.ticks_ms()
+                    main_state = 33            
 
             elif main_state == 50:
                 if time.ticks_ms() - main_state_timer >= 200:

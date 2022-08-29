@@ -475,10 +475,10 @@ while True:
                     main_state = 205
                 else:
                     if tube_drop_status:
-                        stop_silo()
+                        #stop_silo()
                         main_state_timer = time.ticks_ms()
-                        main_state = 15
-                        tube_drop_status = False
+                        main_state = 70
+                        tube_drop_status = False            
             elif main_state == 15:
                 if time.ticks_ms() - main_state_timer >= 200:
                     on_solenoid1()
@@ -573,6 +573,7 @@ while True:
                 if roller_limit_pin.value() == 1:
                     sliding_motor.active(0)
                     set_sliding_backward()
+                    clear_printer_controller()
                     main_state_timer = time.ticks_ms()
                     main_state = 31
             elif main_state == 31:
@@ -589,7 +590,7 @@ while True:
                     main_state_timer = time.ticks_ms()
                     main_state = 60
             elif main_state == 33:
-                if time.ticks_ms() - main_state_timer >= 100:
+                if time.ticks_ms() - main_state_timer >= 500:
                     off_solenoid1()
                     off_solenoid3()
                     sliding_motor.active(1)
@@ -598,7 +599,7 @@ while True:
                 if box_location == 4:
                     main_state = 35
                     # ====== clear printer state
-                    clear_printer_controller()
+                    #clear_printer_controller()
             elif main_state == 35:
                 if box_location == 5:
                     main_state = 36
@@ -640,6 +641,12 @@ while True:
             elif main_state == 51:
                 if time.ticks_ms() - main_state_timer >= 50:
                     main_state = 28
+            elif main_state == 70:
+                if time.ticks_ms() - main_state_timer >= 100:
+                    stop_silo()
+                    main_state_timer = time.ticks_ms()
+                    main_state = 15
+
         except:
             main_state = 207
         # ============= error states =========

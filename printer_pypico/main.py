@@ -73,7 +73,7 @@ except:
     on_delay = 2000
     slap_up_time= 150
     wait_rolling_more_time = 100
-    slap_down_time = 100
+    slap_down_time = 160
     if show_debug:
         print("init fail")
 #======================================================================================================
@@ -101,7 +101,7 @@ debugging_state = 0
 device_link = UART(0, baudrate=9600, bits=8, parity=None, stop=1,tx=Pin(0), rx=Pin(1),timeout=1000)
 device_link.read()                                                                     # clear data in serial port buffer
 
-motor1_controller = rp2.StateMachine(0, run_motor1, freq=20000, set_base=Pin(13))      # GPIO13 => pulse, GPIO12 => direction
+motor1_controller = rp2.StateMachine(0, run_motor1, freq=25000, set_base=Pin(13))      # GPIO13 => pulse, GPIO12 => direction
 motor2_controller = rp2.StateMachine(1, run_motor2, freq=20000, set_base=Pin(15))      # GPIO15 => pulse, GPIO14 => direction
 #========== sub functions ==========
     
@@ -143,6 +143,9 @@ origin_flag = True
 
 while True:
     # =========== command from master ============
+
+    # print(slap_switch.value())
+    # time.sleep(0.2)
     if(device_link.any()):
         try:
             char_cmd = device_link.read(1)
@@ -178,7 +181,7 @@ while True:
                     message = "Out of state"
                     if printer_state < 7:
                         message = "Running"
-                    elif printer_state == 7:
+                    elif printer_state == 9:
                         message = "Complete"
                     elif printer_state == 100:
                         message = "check slap switch"
@@ -271,18 +274,29 @@ while True:
                 motor1_controller.active(0)
                 motor2_controller.active(0)
                 set_slap_motor_down()
-    elif printer_state == 5:                                            # wait rolling more time     
-        if time.ticks_ms() - printer_state_timer >= wait_rolling_more_time:
-            printer_state = 6
-            motor1_controller.active(0)
-            motor2_controller.active(1)
+    elif printer_state == 5:
+        if time.ticks_ms() - printer_state_timer >= 100:
             printer_state_timer = time.ticks_ms()
+            motor1_controller.active(1)
+            printer_state = 6
     elif printer_state == 6:
-        if time.ticks_ms()-printer_state_timer>=slap_down_time:          # slap down
-            printer_state = 7
+        if time.ticks_ms() - printer_state_timer >= 250:
+            printer_state_timer = time.ticks_ms()
             motor1_controller.active(0)
             motor2_controller.active(0)
-    elif printer_state == 7:
+            printer_state = 7
+    elif printer_state == 7:                                            # wait rolling more time     
+        if time.ticks_ms() - printer_state_timer >= wait_rolling_more_time:
+            printer_state = 8
+            motor1_controller.active(1)
+            motor2_controller.active(1)
+            printer_state_timer = time.ticks_ms()
+    elif printer_state == 8:
+        if time.ticks_ms()-printer_state_timer>=slap_down_time:          # slap down
+            printer_state = 9
+            motor1_controller.active(0)
+            motor2_controller.active(0)
+    elif printer_state == 9:
         pass
     elif printer_state == 100:
         pass

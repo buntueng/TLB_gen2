@@ -43,9 +43,9 @@ printer_limit_pin = Pin(22,Pin.IN)
 tube_drop_pin = Pin(6,Pin.IN)
 sticker_detect_pin = Pin(7,Pin.IN)
 
-lock_solenoid_pin = Pin(26,Pin.OUT)
-drop_solenoid_pin = Pin(27,Pin.OUT)
-rolling_solenoid_pin = Pin(28,Pin.OUT)
+lock_solenoid_pin = Pin(27,Pin.OUT)
+drop_solenoid_pin = Pin(28,Pin.OUT)
+rolling_solenoid_pin = Pin(26,Pin.OUT)
 
 pc_link = UART(0, baudrate=115200, bits=8, parity=None, stop=1,tx=Pin(0), rx=Pin(1),timeout=1000)
 device_link = UART(1, baudrate=9600, bits=8, parity=None, stop=1,tx=Pin(4), rx=Pin(5),timeout=1000)
@@ -89,7 +89,7 @@ def clear_printer_controller():
     device_link.write( bytes( ord(ch) for ch in message))
 
 def initial_io():
-    rolling_motor_dir_pin.value(0)
+    rolling_motor_dir_pin.value(1)
     sliding_motor_dir_pin.value(0)
     # turn off all solenoid
     lock_solenoid_pin.value(0)
@@ -189,6 +189,8 @@ while True:
     # get proximeter sensors
     box_location = read_prox()
     # check tube drop status
+    # print(tube_drop_pin.value(), +sticker_detect_pin.value())
+    # time.sleep(0.2)
     if tube_drop_pin.value() == 0:
         tube_drop_status = True
 
@@ -557,6 +559,7 @@ while True:
                 else:
                     if check_printer_state_counter >= 5:
                         main_state = 206
+                        rolling_motor.active(0)
                     else:
                         check_printer_state_counter = check_printer_state_counter + 1
                         main_state_timer = time.ticks_ms()
@@ -582,12 +585,14 @@ while True:
                 if time.ticks_ms() - main_state_timer >= 100:
                     on_solenoid1()
                     on_solenoid3()
+                    sliding_motor.active(0)
                     main_state_timer = time.ticks_ms()
-                    main_state = 33
+                    main_state = 60
             elif main_state == 33:
                 if time.ticks_ms() - main_state_timer >= 100:
                     off_solenoid1()
                     off_solenoid3()
+                    sliding_motor.active(1)
                     main_state = 34
             elif main_state == 34:
                 if box_location == 4:
@@ -614,7 +619,13 @@ while True:
                     main_state = 41
             elif main_state == 41:
                 pass
-        
+            
+            elif main_state == 60:
+                if time.ticks_ms() - main_state_timer >= 500:
+                    main_state_timer = time.ticks_ms()
+                    main_state =33
+
+
             elif main_state == 50:
                 if time.ticks_ms() - main_state_timer >= 200:
                     resp_flag = False

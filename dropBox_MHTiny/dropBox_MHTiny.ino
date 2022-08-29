@@ -9,9 +9,9 @@ const int m1_pin2 = 11;
 const int sticker_detect_pin = 12;
 const int tube_detect_pin = 13;
 //======== sticker detect sensor ============
-const int sticker_detec_pin = 6;
+const int sticker_detec_pin = 7;
 // ========== drop tube sensors =======
-const int tube_detect_pin1 = 7;
+const int tube_detect_pin1 = 6;
 const int tube_detect_pin2 = 8;
 const int tube_detect_pin3 = 9;
 // ============ subfunctions ========

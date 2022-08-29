@@ -2,7 +2,7 @@ from machine import Pin, UART, reset
 import time
 import rp2
 
-show_debug = False
+show_debug = True
 
 device_id = '3'
 master_command = ""

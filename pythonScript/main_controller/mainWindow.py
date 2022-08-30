@@ -78,8 +78,8 @@ class MainControllerApp:
         self.init_widget()
         # Main widget
         self.mainwindow = self.toplevel1
-        self.test_messagetext()                        #this is a debugging function
-        self.update_hilight_status()                  #call this function after update status_text widget
+        # self.test_messagetext()                        #this is a debugging function
+        # self.update_hilight_status()                  #call this function after update status_text widget
         self.run_main_state()
     
     def run(self):

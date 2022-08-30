@@ -71,9 +71,9 @@ try:
         print("init ok")
 except:
     on_delay = 200
-    slap_up_time= 150
-    wait_rolling_more_time = 100
-    slap_down_time = 160
+    slap_up_time= 50
+    wait_rolling_more_time = 50
+    slap_down_time = 70
     if show_debug:
         print("init fail")
 #======================================================================================================
@@ -84,8 +84,12 @@ motor_timer = 0
 # ========= assigned direction pin ===========
 duo_switch = Pin(27,Pin.IN,Pin.PULL_UP)
 slap_switch = Pin(20,Pin.IN,Pin.PULL_UP)
-motor1_dir_pin = Pin(12,Pin.OUT)                    # paper roller motor
-motor2_dir_pin = Pin(14,Pin.OUT)                    # slap motor
+motor1_dir_pin = Pin(14,Pin.OUT)                    # paper roller motor old =====12
+motor2_dir_pin = Pin(12,Pin.OUT)                    # slap motor old ===== 14
+
+relay_slab = Pin(10,Pin.OUT)
+relay_roller = Pin(11,Pin.OUT)
+
 # motor3_dir_pin = Pin(21,Pin.OUT)
 # motor4_dir_pin = Pin(27,Pin.OUT)
 slap_target_pulse = 1000
@@ -101,8 +105,8 @@ debugging_state = 0
 device_link = UART(0, baudrate=9600, bits=8, parity=None, stop=1,tx=Pin(0), rx=Pin(1),timeout=1000)
 device_link.read()                                                                     # clear data in serial port buffer
 
-motor1_controller = rp2.StateMachine(0, run_motor1, freq=25000, set_base=Pin(13))      # GPIO13 => pulse, GPIO12 => direction
-motor2_controller = rp2.StateMachine(1, run_motor2, freq=20000, set_base=Pin(15))      # GPIO15 => pulse, GPIO14 => direction
+motor1_controller = rp2.StateMachine(0, run_motor1, freq=2500000, set_base=Pin(15))      # old === GPIO13 => pulse, GPIO12 => direction //roller
+motor2_controller = rp2.StateMachine(1, run_motor2, freq=2000000, set_base=Pin(13))      # old === GPIO15 => pulse, GPIO14 => direction //slab
 #========== sub functions ==========
     
 def set_dir(motor_number,direction):
@@ -112,6 +116,17 @@ def set_dir(motor_number,direction):
         motor2_dir_pin.value(direction)
     elif motor_number == 0:
         pass
+def On_slab():
+    relay_slab.value(1)
+    
+def Off_slab():
+    relay_slab.value(0)
+    
+def On_roller():
+    relay_roller.value(1)
+
+def Off_roller():
+    relay_roller.value(0)
 
 def off_motor():
     motor1_controller.active(0)
@@ -126,16 +141,16 @@ def resp_485(message):
     device_link.write(bytes( ord(ch) for ch in resp_message))
 
 def set_roller_motor_forward():     # tight paper
-    motor1_dir_pin.value(0)
-
-def set_roller_motor_backward():     # release paper
     motor1_dir_pin.value(1)
 
+def set_roller_motor_backward():     # release paper
+    motor1_dir_pin.value(0)
+
 def set_slap_motor_up():
-    motor2_dir_pin.value(1)
+    motor2_dir_pin.value(0)
 
 def set_slap_motor_down():
-    motor2_dir_pin.value(0)
+    motor2_dir_pin.value(1)
 
 off_motor()
 initial_io()
@@ -213,6 +228,18 @@ while True:
                             debug_slap_motor_backward = True
                             message = message + "slap backward"
                             debugging_state = 0
+                        elif master_command[2] == '5':
+                            On_slab()
+                            message = "On slab"
+                        elif master_command[2] == '6':
+                            Off_slab()
+                            message = "Off slab"
+                        elif master_command[2] == '7':
+                            On_roller()
+                            message = "On roller"
+                        elif master_command[2] == '8':
+                            Off_roller()
+                            message = "Off roller"                            
                         resp_485(message=message)
                 elif master_command[1] == 'u':          # update params
                     message = "Update parameters"
@@ -247,28 +274,35 @@ while True:
             set_roller_motor_forward()
             run_printer_flag = False
     elif printer_state == 1:
+        On_roller()
+        On_slab()
         if (time.ticks_ms() - printer_state_timer) >= 100:
             printer_state = 2
+            print("state 1")
             printer_state_timer = time.ticks_ms()
             motor2_controller.active(1)
     elif printer_state == 2:                                            # slapup
         if time.ticks_ms()-printer_state_timer>= slap_up_time:
             printer_state = 3
+            print("state 2")
             printer_state_timer = time.ticks_ms()
             motor1_controller.active(0)
             motor2_controller.active(0)
     elif printer_state == 3:                                            # wait for sticker
         if (time.ticks_ms() - printer_state_timer) >= on_delay:
             printer_state = 4
+            print("state 3")
             motor1_controller.active(1)
             printer_state_timer = time.ticks_ms()
     elif printer_state == 4:                                            # === rolling paper
         if time.ticks_ms() - printer_state_timer >= 5000:               # === if switch not pressed within 5 seconds >> goto state 100
             printer_state = 100
+            print("state 100")
             motor1_controller.active(0)
             motor2_controller.active(0)
         else:
             if duo_switch.value() == 1:
+                print("state 4")
                 printer_state = 5
                 printer_state_timer = time.ticks_ms()
                 motor1_controller.active(0)
@@ -278,24 +312,30 @@ while True:
         if time.ticks_ms() - printer_state_timer >= 100:
             printer_state_timer = time.ticks_ms()
             motor1_controller.active(1)
+            print("state 5")
             printer_state = 6
     elif printer_state == 6:
-        if time.ticks_ms() - printer_state_timer >= 250:
+        if time.ticks_ms() - printer_state_timer >= 20:
             printer_state_timer = time.ticks_ms()
             motor1_controller.active(0)
             motor2_controller.active(0)
+            print("state 6")
             printer_state = 7
     elif printer_state == 7:                                            # wait rolling more time     
         if time.ticks_ms() - printer_state_timer >= wait_rolling_more_time:
             printer_state = 8
+            print("state 7")
             motor1_controller.active(1)
             motor2_controller.active(1)
             printer_state_timer = time.ticks_ms()
     elif printer_state == 8:
         if time.ticks_ms()-printer_state_timer>=slap_down_time:          # slap down
             printer_state = 9
+            print("state 8")
             motor1_controller.active(0)
             motor2_controller.active(0)
+            Off_slab()
+            Off_roller()
     elif printer_state == 9:
         pass
     elif printer_state == 100:
@@ -303,6 +343,7 @@ while True:
 
     if debug_roller_motor_forward:
         if debugging_state == 0:
+            On_roller()
             set_roller_motor_forward()
             motor1_controller.active(1)
             debugging_timer = time.ticks_ms()
@@ -310,6 +351,7 @@ while True:
         elif debugging_state == 1:
             if time.ticks_ms() - debugging_timer >= 1000:
                 motor1_controller.active(0)
+                Off_roller()
                 debugging_state = 2
                 debug_roller_motor_forward = False
         elif debugging_state == 2:
@@ -317,6 +359,7 @@ while True:
     
     if debug_roller_motor_backward:
         if debugging_state == 0:
+            On_roller()
             set_roller_motor_backward()
             motor1_controller.active(1)
             debugging_state = 1
@@ -324,6 +367,7 @@ while True:
         elif debugging_state == 1:
             if time.ticks_ms() - debugging_timer >= 1000:
                 motor1_controller.active(0)
+                Off_roller()
                 debugging_state = 2
                 debug_roller_motor_backward = False
         elif debugging_state == 2:
@@ -332,12 +376,14 @@ while True:
     if debug_slap_motor_forward:
         if debugging_state == 0:
             set_slap_motor_up()
+            On_slab()
             motor2_controller.active(1)
             debugging_state = 1
             debugging_timer = time.ticks_ms()
         elif debugging_state == 1:
-            if time.ticks_ms() - debugging_timer >= 100:
+            if time.ticks_ms() - debugging_timer >= 50:
                 motor2_controller.active(0)
+                Off_slab()
                 debugging_state = 2
                 debug_slap_motor_forward = False
         elif debugging_state == 2:
@@ -346,12 +392,14 @@ while True:
     if debug_slap_motor_backward:
         if debugging_state == 0:
             set_slap_motor_down()
+            On_slab()
             motor2_controller.active(1)
             debugging_state = 1
             debugging_timer = time.ticks_ms()
         elif debugging_state == 1:
-            if time.ticks_ms() - debugging_timer >= 100:
+            if time.ticks_ms() - debugging_timer >= 50:
                 motor2_controller.active(0)
+                Off_slab()
                 debug_slap_motor_backward = False
                 debugging_state = 2
         elif debugging_state == 2:
@@ -360,6 +408,8 @@ while True:
 
     if origin_state == 0:
         if origin_flag == True:
+            On_roller()
+            On_slab()
             motor1_controller.active(0)
             motor2_controller.active(0)
             set_roller_motor_backward()
@@ -382,14 +432,14 @@ while True:
             motor2_controller.active(0)
             origin_state_timer = time.ticks_ms()
     elif origin_state == 3:
-        if time.ticks_ms() - origin_state_timer >= 500:
+        if time.ticks_ms() - origin_state_timer >= 300:
             motor1_controller.active(0)
+            Off_roller()
+            Off_slab()
             origin_state = 4
     elif origin_state == 4:
         pass
-
     elif origin_state == 5:     # slap switch error
         pass
-
 
 

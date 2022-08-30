@@ -29,6 +29,8 @@ move_origin_timer = 0
 
 fast_sliding_motor = True
 
+relay_rolling_pin = Pin(21,Pin.OUT)
+relay_sliding_pin = Pin(20,Pin.OUT)
 rolling_motor_dir_pin = Pin(19,Pin.OUT)
 sliding_motor_dir_pin = Pin(17,Pin.OUT)
 prox1_pin = Pin(10,Pin.IN)
@@ -71,11 +73,23 @@ def read_prox():
         return_sw_status = 0
     return return_sw_status
 
+def On_rolling():
+    relay_rolling_pin.value(1)
+
+def Off_rolling():
+    relay_rolling_pin.value(0)
+
+def On_sliding():
+    relay_sliding_pin.value(1)
+
+def Off_sliding():
+    relay_sliding_pin.value(0)
+
 def set_sliding_forward():
-    sliding_motor_dir_pin.value(1)
+    sliding_motor_dir_pin.value(0)
 
 def set_sliding_backward():
-    sliding_motor_dir_pin.value(0)
+    sliding_motor_dir_pin.value(1)
 
 def save_params():
     pass
@@ -90,11 +104,12 @@ def clear_printer_controller():
 
 def initial_io():
     rolling_motor_dir_pin.value(1)
-    sliding_motor_dir_pin.value(0)
+    sliding_motor_dir_pin.value(1)
     # turn off all solenoid
     lock_solenoid_pin.value(0)
     drop_solenoid_pin.value(0)
     rolling_solenoid_pin.value(0)
+    sliding_motor_dir_pin.value(0)
 
 def run_silo(silo_number):
     message = '2'+ str(silo_number)+'\n'
@@ -172,8 +187,8 @@ def run_sliding_motor_step2():
     nop()
     wrap()
 
-sliding_motor = rp2.StateMachine(0, run_sliding_motor, freq=75000, set_base=Pin(16))      # GPIO16 => pulse, GPIO17 => direction
-rolling_motor = rp2.StateMachine(1, run_roller_motor, freq=75000, set_base=Pin(18))      # GPIO18 => pulse, GPIO19 => direction
+sliding_motor = rp2.StateMachine(0, run_sliding_motor, freq=2800000, set_base=Pin(16))      # GPIO16 => pulse, GPIO17 => direction //2600000
+rolling_motor = rp2.StateMachine(1, run_roller_motor, freq=3500000, set_base=Pin(18))      # GPIO18 => pulse, GPIO19 => direction
 rolling_motor.active(0)
 sliding_motor.active(0)
 rolling_motor_dir_pin.value(1)
@@ -209,8 +224,10 @@ while True:
             if front_and_back_limit_pin.value() == 0:
                 move_origin_state = 100
                 move_origin = False
+                Off_sliding()
                 sliding_motor.active(0)
             else:
+                On_sliding()
                 move_origin_state = 1
                 set_sliding_backward()
                 sliding_motor.active(1)
@@ -219,30 +236,38 @@ while True:
             if front_and_back_limit_pin.value() == 0:
                 move_origin_state = 100
                 move_origin = False
+                Off_sliding()
                 sliding_motor.active(0)
             else:
                 if time.ticks_ms() - move_origin_timer >= 3000:
                     move_origin_state = 102
                     move_origin = False
+                    Off_sliding()
                     sliding_motor.active(0)
                 else:
                     if box_location == 1:
                         move_origin_state = 2
                         move_origin = False
+                        Off_sliding()
                         sliding_motor.active(0)
                     elif box_location == 0:
                         move_origin_state = 101
                         move_origin = False
+                        Off_sliding()
                         sliding_motor.active(0)
                     else:
                         pass
         elif move_origin_state == 2:                    # sliding motor is origin
+            Off_sliding()
             pass
         elif move_origin_state == 100:                  # sliding motor hits limit switch
+            Off_sliding()
             pass
         elif move_origin_state == 101:                  # prox sensor error
+            Off_sliding()
             pass
         elif move_origin_state == 102:                  # sliding motor can not run
+            Off_sliding()
             pass
     # =========== command from pc ============
     if(pc_link.any()):
@@ -297,6 +322,7 @@ while True:
                         sticker_detect_status = False
                     elif pc_command[1] == 'o':                                          # move sliding motor to origin
                         move_origin_state = 0
+                        On_sliding()
                         move_origin = True
                         message = "Go origin"
                         pc_response(resp_message=message)           
@@ -305,21 +331,27 @@ while True:
                         message = ""
                         if pc_command[2] == '1':
                             set_sliding_forward()
+                            On_sliding()
                             sliding_motor.active(1)
                             time.sleep(0.5)
                             sliding_motor.active(0)
+                            Off_sliding()
                             message = "move sliding forward"
                         elif pc_command[2] == '2':
                             set_sliding_backward()
+                            On_sliding()
                             sliding_motor.active(1)
                             time.sleep(0.5)
+                            Off_sliding()
                             sliding_motor.active(0)
                             message = "move sliding backward"
                         elif pc_command[2] == '3':
+                            On_rolling()
                             rolling_motor_dir_pin.value(1)
                             rolling_motor.active(1)
                             time.sleep(1)
                             rolling_motor.active(0)
+                            Off_rolling()
                             message = "run rolling motor"
                         elif pc_command[2] == '4':
                             on_solenoid1()
@@ -336,17 +368,29 @@ while True:
                             time.sleep(0.2)
                             off_solenoid3()
                             message = "on_solinoid3"
+                        elif pc_command[2]=='7':
+                            On_sliding()
+                            On_rolling()
+                            time.sleep(0.2)
+                            message = "On sliding"
+                        elif pc_command[2]=='8':
+                            Off_sliding()
+                            Off_rolling()
+                            time.sleep(0.2)
+                            message ="Off sliding"
                         pc_response(resp_message=message)
                     elif pc_command[1] == 'g':
                         present_silo = int(pc_command[2])
                         if present_silo >0 and present_silo <=4:
                             run_main_state = True
                             main_state = 0
+                            On_sliding()
                             message = "run machine"
                         else:
                             run_main_state = False
                             sliding_motor.active(0)
                             main_state = 0
+                            Off_sliding()
                             message = "stop machine"
                         pc_response(resp_message=message)
             else:
@@ -364,6 +408,7 @@ while True:
         #======== check prox sensor ======
         if box_location == 0:
             main_state = 202
+            Off_sliding()
             sliding_motor.active(0)         # stop sliding motor
             # sliding_motor.active(0)
             off_solenoid1()
@@ -372,6 +417,7 @@ while True:
         #======== check limit_switch=======
         if front_and_back_limit_pin.value() == 0:
             main_state = 203
+            Off_sliding()
             sliding_motor.active(0)         # stop sliding motor
             # sliding_motor1.active(0)
             off_solenoid1()
@@ -534,7 +580,9 @@ while True:
             elif main_state == 25:                  # stop at box 4
                 if box_location == 4:
                     main_state = 26
+            
             elif main_state == 26:
+                On_rolling()
                 sliding_motor.active(0)
                 rolling_motor.active(1)
                 resp_flag = False
@@ -561,6 +609,7 @@ while True:
                 else:
                     if check_printer_state_counter >= 20:
                         main_state = 206
+                        Off_rolling()
                         rolling_motor.active(0)
                     else:
                         check_printer_state_counter = check_printer_state_counter + 1
@@ -584,6 +633,7 @@ while True:
                     rolling_motor.active(0)
                     on_solenoid1()
                     on_solenoid3()
+                    Off_rolling()
                     main_state_timer = time.ticks_ms()
                     main_state = 32
             elif main_state == 32:
@@ -627,6 +677,7 @@ while True:
                 resp_flag = False
                 device_resp_message = ""
             elif main_state == 41:
+                Off_sliding()
                 pass
             
             elif main_state == 60:
@@ -667,6 +718,7 @@ while True:
                     main_state = 15
 
         except:
+            Off_sliding()
             main_state = 207
         # ============= error states =========
         #main_state == 200:             # printer module not response

@@ -70,7 +70,7 @@ try:
     if show_debug:
         print("init ok")
 except:
-    on_delay = 200
+    on_delay = 500
     slap_up_time= 50
     wait_rolling_more_time = 50
     slap_down_time = 70
@@ -315,7 +315,7 @@ while True:
             print("state 5")
             printer_state = 6
     elif printer_state == 6:
-        if time.ticks_ms() - printer_state_timer >= 20:
+        if time.ticks_ms() - printer_state_timer >= 30:
             printer_state_timer = time.ticks_ms()
             motor1_controller.active(0)
             motor2_controller.active(0)
@@ -424,7 +424,7 @@ while True:
             origin_state_timer = time.ticks_ms()
             origin_state = 2
     elif origin_state == 2:
-        if time.ticks_ms() - origin_state_timer >= 1000:
+        if time.ticks_ms() - origin_state_timer >= 500:
             origin_state = 5
             motor2_controller.active(0)
         if slap_switch.value() == 0:
@@ -432,7 +432,7 @@ while True:
             motor2_controller.active(0)
             origin_state_timer = time.ticks_ms()
     elif origin_state == 3:
-        if time.ticks_ms() - origin_state_timer >= 300:
+        if time.ticks_ms() - origin_state_timer >= 100:
             motor1_controller.active(0)
             Off_roller()
             Off_slab()

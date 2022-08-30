@@ -40,7 +40,7 @@ prox4_pin = Pin(13,Pin.IN)
 
 roller_limit_pin = Pin(15,Pin.IN,Pin.PULL_UP)
 front_and_back_limit_pin = Pin(14,Pin.IN,Pin.PULL_UP)
-printer_limit_pin = Pin(22,Pin.IN)
+#printer_limit_pin = Pin(22,Pin.IN)
 
 tube_drop_pin = Pin(6,Pin.IN)
 sticker_detect_pin = Pin(7,Pin.IN)
@@ -187,10 +187,13 @@ def run_sliding_motor_step2():
     nop()
     wrap()
 
+sliding_motor_step2 = rp2.StateMachine(0, run_sliding_motor_step2, freq=1000000, set_base=Pin(22))      # GPIO16 => pulse, GPIO17 => direction //2600000
 sliding_motor = rp2.StateMachine(0, run_sliding_motor, freq=2800000, set_base=Pin(16))      # GPIO16 => pulse, GPIO17 => direction //2600000
 rolling_motor = rp2.StateMachine(1, run_roller_motor, freq=3500000, set_base=Pin(18))      # GPIO18 => pulse, GPIO19 => direction
+
 rolling_motor.active(0)
 sliding_motor.active(0)
+sliding_motor_step2.active(0)
 rolling_motor_dir_pin.value(1)
 initial_io()
 # move sliding motor to origin
@@ -335,6 +338,11 @@ while True:
                             sliding_motor.active(1)
                             time.sleep(0.5)
                             sliding_motor.active(0)
+                            time.sleep(0.5)
+                            sliding_motor_step2.active(1)
+                            time.sleep(0.5)
+                            sliding_motor_step2.active(0)
+                            time.sleep(0.5)
                             Off_sliding()
                             message = "move sliding forward"
                         elif pc_command[2] == '2':
@@ -342,8 +350,13 @@ while True:
                             On_sliding()
                             sliding_motor.active(1)
                             time.sleep(0.5)
-                            Off_sliding()
                             sliding_motor.active(0)
+                            time.sleep(0.5)
+                            sliding_motor_step2.active(1)
+                            time.sleep(0.5)
+                            sliding_motor_step2.active(0)
+                            time.sleep(0.5)
+                            Off_sliding()
                             message = "move sliding backward"
                         elif pc_command[2] == '3':
                             On_rolling()
@@ -628,7 +641,7 @@ while True:
                     main_state_timer = time.ticks_ms()
                     main_state = 31
             elif main_state == 31:
-                if time.ticks_ms()-main_state_timer >= 800:
+                if time.ticks_ms()-main_state_timer >= 500:
                     sliding_motor.active(1)
                     rolling_motor.active(0)
                     on_solenoid1()
@@ -636,8 +649,11 @@ while True:
                     Off_rolling()
                     main_state_timer = time.ticks_ms()
                     main_state = 32
+                if time.ticks_ms() - main_state_timer >= 300:
+                    on_solenoid1()
+                    on_solenoid3()
             elif main_state == 32:
-                if time.ticks_ms() - main_state_timer >= 50:
+                if time.ticks_ms() - main_state_timer >= 45:
                     # on_solenoid1()
                     # on_solenoid3()
                     sliding_motor.active(0)
@@ -645,7 +661,7 @@ while True:
                     main_state = 60
             elif main_state == 33:
                 if time.ticks_ms() - main_state_timer >= 100:
-                    off_solenoid1()
+                    #off_solenoid1()
                     off_solenoid3()
                     sliding_motor.active(1)
                     main_state = 34
@@ -659,6 +675,7 @@ while True:
                     main_state = 36
             elif main_state == 36:
                 if box_location == 3:
+                    off_solenoid1()
                     main_state = 37
             elif main_state == 37:
                 if box_location == 5:
@@ -681,7 +698,7 @@ while True:
                 pass
             
             elif main_state == 60:
-                if time.ticks_ms() - main_state_timer >= 50:
+                if time.ticks_ms() - main_state_timer >= 300:
                     main_state_timer = time.ticks_ms()
                     sliding_motor.active(1)
                     main_state =61

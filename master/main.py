@@ -552,7 +552,7 @@ while True:
                         device_resp_message = ""
             elif main_state == 16:
                 if time.ticks_ms() - main_state_timer >= 200:
-                    off_solenoid1()
+                    # off_solenoid1()
                     main_state = 17
             elif main_state == 17:
                 if sticker_detect_status:
@@ -562,8 +562,9 @@ while True:
                 else:
                     main_state = 19
             elif main_state == 18:
-                if time.ticks_ms()-main_state_timer >=500:
+                if time.ticks_ms()-main_state_timer >=300: #500
                     off_solenoid2()
+                    off_solenoid1()
                     main_state = 19
             elif main_state == 19:
                 sliding_motor.active(1)
@@ -605,7 +606,7 @@ while True:
                 main_state_timer = time.ticks_ms()
                 main_state = 27
             elif main_state == 27:
-                if time.ticks_ms() - main_state_timer >= 200:
+                if time.ticks_ms() - main_state_timer >= 50:#200
                     main_state = 28
             elif main_state == 28:
                 if resp_flag:
@@ -719,17 +720,17 @@ while True:
                     main_state = 33            
 
             elif main_state == 50:
-                if time.ticks_ms() - main_state_timer >= 200:
+                if time.ticks_ms() - main_state_timer >= 5:#200
                     resp_flag = False
                     device_resp_message = ""
                     check_printer_state()
                     main_state_timer = time.ticks_ms()
                     main_state = 51
             elif main_state == 51:
-                if time.ticks_ms() - main_state_timer >= 50:
+                if time.ticks_ms() - main_state_timer >= 5:
                     main_state = 28
             elif main_state == 70:
-                if time.ticks_ms() - main_state_timer >= 100:
+                if time.ticks_ms() - main_state_timer >= 5: #100
                     stop_silo()
                     main_state_timer = time.ticks_ms()
                     main_state = 15

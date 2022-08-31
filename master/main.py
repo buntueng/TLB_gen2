@@ -40,7 +40,7 @@ prox4_pin = Pin(13,Pin.IN)
 
 roller_limit_pin = Pin(15,Pin.IN,Pin.PULL_UP)
 front_and_back_limit_pin = Pin(14,Pin.IN,Pin.PULL_UP)
-#printer_limit_pin = Pin(22,Pin.IN)
+printer_limit_pin = Pin(22,Pin.IN)
 
 tube_drop_pin = Pin(6,Pin.IN)
 sticker_detect_pin = Pin(7,Pin.IN)
@@ -100,6 +100,9 @@ def run_printer_controller():
 
 def clear_printer_controller():
     message = '3s0\n'
+    device_link.write( bytes( ord(ch) for ch in message))
+def come_back_origin():
+    message = '1o\n'
     device_link.write( bytes( ord(ch) for ch in message))
 
 def initial_io():
@@ -203,13 +206,11 @@ def run_sliding_motor_step2():
     nop()
     wrap()
 
-sliding_motor_step2 = rp2.StateMachine(0, run_sliding_motor_step2, freq=1000000, set_base=Pin(22))      # GPIO16 => pulse, GPIO17 => direction //2600000
-sliding_motor = rp2.StateMachine(0, run_sliding_motor, freq=2800000, set_base=Pin(16))      # GPIO16 => pulse, GPIO17 => direction //2600000
-rolling_motor = rp2.StateMachine(1, run_roller_motor, freq=3500000, set_base=Pin(18))      # GPIO18 => pulse, GPIO19 => direction
 
+sliding_motor = rp2.StateMachine(0, run_sliding_motor, freq=2800000, set_base=Pin(16))      # GPIO16 => pulse, GPIO17 => direction //2600000
+rolling_motor = rp2.StateMachine(1, run_roller_motor, freq=1500000, set_base=Pin(18))      # GPIO18 => pulse, GPIO19 => direction
 rolling_motor.active(0)
 sliding_motor.active(0)
-sliding_motor_step2.active(0)
 rolling_motor_dir_pin.value(1)
 initial_io()
 # move sliding motor to origin
@@ -340,9 +341,9 @@ while True:
                         tube_drop_status = False
                         sticker_detect_status = False
                     elif pc_command[1] == 'o':                                          # move sliding motor to origin
-                        move_origin_state = 0
                         On_sliding()
                         move_origin = True
+                        move_origin_state = 0
                         message = "Go origin"
                         pc_response(resp_message=message)           
                 elif len(pc_command) == 3:
@@ -355,10 +356,6 @@ while True:
                             time.sleep(0.5)
                             sliding_motor.active(0)
                             time.sleep(0.5)
-                            sliding_motor_step2.active(1)
-                            time.sleep(0.5)
-                            sliding_motor_step2.active(0)
-                            time.sleep(0.5)
                             Off_sliding()
                             message = "move sliding forward"
                         elif pc_command[2] == '2':
@@ -367,10 +364,6 @@ while True:
                             sliding_motor.active(1)
                             time.sleep(0.5)
                             sliding_motor.active(0)
-                            time.sleep(0.5)
-                            sliding_motor_step2.active(1)
-                            time.sleep(0.5)
-                            sliding_motor_step2.active(0)
                             time.sleep(0.5)
                             Off_sliding()
                             message = "move sliding backward"
@@ -547,7 +540,7 @@ while True:
                         main_state = 12
                         main_state_timer = time.ticks_ms()
             elif main_state == 14:
-                if time.ticks_ms() - main_state_timer >= 5000:
+                if time.ticks_ms() - main_state_timer >= 7000:
                     stop_silo()
                     main_state = 205
                 else:
@@ -558,7 +551,7 @@ while True:
                         tube_drop_status = False            
             elif main_state == 15:
                 if time.ticks_ms() - main_state_timer >= 200:
-                    on_solenoid1()
+                    #on_solenoid1()
                     main_state_timer = time.ticks_ms()
                     sticker_detect_status = False
                     main_state = 16
@@ -666,7 +659,7 @@ while True:
                     Off_rolling()
                     main_state_timer = time.ticks_ms()
                     main_state = 32
-                if time.ticks_ms() - main_state_timer >= 300:
+                if time.ticks_ms() - main_state_timer >= 450:
                     on_solenoid1()
                     on_solenoid3()
             elif main_state == 32:
@@ -745,9 +738,12 @@ while True:
             elif main_state == 51:
                 if time.ticks_ms() - main_state_timer >= 5:
                     main_state = 28
+
+            #===================== stop silo =============================        
             elif main_state == 70:
-                if time.ticks_ms() - main_state_timer >= 5: #100
+                if time.ticks_ms() - main_state_timer >= 130: #100
                     stop_silo()
+                    on_solenoid1()
                     main_state_timer = time.ticks_ms()
                     main_state = 15
 

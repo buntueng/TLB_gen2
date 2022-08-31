@@ -158,6 +158,22 @@ def check_running_state():
         message = "complete"
     elif main_state == 21:
         message = "jam"
+    elif main_state == 200:
+        message = "printer module not response"
+    elif main_state == 201:
+        message = "sliding not origin"
+    elif main_state == 202:
+        message = "prox sensor error"
+    elif main_state == 203:
+        message = "limit switch"
+    elif main_state == 204:
+        message = "silo module not response"
+    elif main_state == 205:
+        message = "tube jam"
+    elif main_state == 206:
+        message = "printer module not response"
+    elif main_state == 200:
+        message = "try condition error"
     return message + "\n"
 
 @rp2.asm_pio(set_init=rp2.PIO.OUT_LOW)

@@ -172,7 +172,7 @@ def check_running_state():
         message = "tube jam"
     elif main_state == 206:
         message = "printer module not response"
-    elif main_state == 200:
+    elif main_state == 207:
         message = "try condition error"
     return message + "\n"
 

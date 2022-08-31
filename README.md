@@ -1,2 +1,2 @@
 # TLB_gen2
-TLB 2 generation
+โปรแกรมทั้งหมดใน TLB 2nd generation แตกต่างจาก TLB ทั้งหมด โดยได้เลือกใช้บอร์ด pi pico เข้ามาแทนบอร์ด arduino mega และ arduino nano เนื่องจากเหตุผลทางด้านราคาและประสิทธิภาพของตัวประมวลผล

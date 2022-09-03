@@ -374,8 +374,4 @@ void setup_ios(void)
   digitalWrite(Y_DIR_pin,LOW);
   digitalWrite(Z_DIR_pin,LOW);
   digitalWrite(A_DIR_pin,LOW);
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 5c539a3b9cc7af5045deca035c3a320306f3427f

@@ -42,6 +42,8 @@ roller_limit_pin = Pin(15,Pin.IN,Pin.PULL_UP)
 front_and_back_limit_pin = Pin(14,Pin.IN,Pin.PULL_UP)
 printer_limit_pin = Pin(22,Pin.IN)
 
+tube_drop_pin = Pin(6,Pin.IN)
+sticker_detect_pin = Pin(7,Pin.IN)
 
 lock_solenoid_pin = Pin(27,Pin.OUT)
 drop_solenoid_pin = Pin(28,Pin.OUT)

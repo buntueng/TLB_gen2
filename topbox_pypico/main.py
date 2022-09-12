@@ -51,18 +51,18 @@ run_motor_flag = False
 motor_state = 0
 motor_timer = 0
 # ========= assigned direction pin ===========
-silo1_dir_pin = Pin(16,Pin.OUT)
-silo2_dir_pin = Pin(19,Pin.OUT)
-silo3_dir_pin = Pin(21,Pin.OUT)
-silo4_dir_pin = Pin(27,Pin.OUT)
+silo1_dir_pin = Pin(15,Pin.OUT)
+silo2_dir_pin = Pin(17,Pin.OUT)
+silo3_dir_pin = Pin(20,Pin.OUT)
+silo4_dir_pin = Pin(26,Pin.OUT)
 
-device_link = UART(0, baudrate=115200, bits=8, parity=None, stop=1,tx=Pin(0), rx=Pin(1),timeout=1000)
+device_link = UART(1, baudrate=9600, bits=8, parity=None, stop=1,tx=Pin(8), rx=Pin(9),timeout=1000)
 device_link.read()              # clear data in serial port buffer
 
-silo1_motor = rp2.StateMachine(0, run_silo1_motor, freq=2000, set_base=Pin(17))      # GPIO16 => pulse, GPIO17 => direction
-silo2_motor = rp2.StateMachine(1, run_silo2_motor, freq=2000, set_base=Pin(18))      # GPIO18 => pulse, GPIO19 => direction
-silo3_motor = rp2.StateMachine(2, run_silo3_motor, freq=2000, set_base=Pin(20))      # GPIO18 => pulse, GPIO21 => direction
-silo4_motor = rp2.StateMachine(3, run_silo4_motor, freq=2000, set_base=Pin(26))      # GPIO18 => pulse, GPIO27 => direction
+silo1_motor = rp2.StateMachine(0, run_silo1_motor, freq=200000, set_base=Pin(14))      # GPIO16 => pulse, GPIO17 => direction
+silo2_motor = rp2.StateMachine(1, run_silo2_motor, freq=200000, set_base=Pin(18))      # GPIO18 => pulse, GPIO19 => direction
+silo3_motor = rp2.StateMachine(2, run_silo3_motor, freq=200000, set_base=Pin(21))      # GPIO18 => pulse, GPIO21 => direction
+silo4_motor = rp2.StateMachine(3, run_silo4_motor, freq=200000, set_base=Pin(27))      # GPIO18 => pulse, GPIO27 => direction
 #========== sub functions ==========
 def on_motor(motor_number):
     if motor_number == 1:
@@ -146,24 +146,28 @@ while True:
                     current_silo = 1
                     run_motor_flag = True
                     message = "OK\n"
+                    print("BOX1")
                     resp_485(message=message)   
 
                 elif master_command[1] == '2':
                     current_silo = 2
                     run_motor_flag = True
                     message = "OK\n"
+                    print("BOX2")
                     resp_485(message=message)
                 
                 elif master_command[1] == '3':
                     current_silo = 3
                     run_motor_flag = True
                     message = "OK\n"
+                    print("BOX3")
                     resp_485(message=message)
 
                 elif master_command[1] == '4':
                     current_silo = 4
                     run_motor_flag = True
                     message = "OK\n"
+                    print("BOX4")
                     resp_485(message=message)
 
                 elif master_command[1] == '0':         # turnoff all motors

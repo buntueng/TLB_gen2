@@ -161,6 +161,7 @@ while True:
 
     # print(slap_switch.value())
     # time.sleep(0.2)
+    # print(duo_switch.value())
     if(device_link.any()):
         try:
             char_cmd = device_link.read(1)
@@ -192,6 +193,11 @@ while True:
                             origin_state = 0
                         message = "OK"
                         resp_485(message=message)
+
+                elif master_command[1] == 'l':
+                    message = str(duo_switch.value()) + "\t" + str(slap_switch.value())
+                    resp_485(message=message)
+                    message = ""
                 elif master_command[1] == 'c':          # check printer operation
                     message = "Out of state"
                     if printer_state < 7:
@@ -308,6 +314,7 @@ while True:
                 motor1_controller.active(0)
                 motor2_controller.active(0)
                 set_slap_motor_down()
+                set_roller_motor_forward()
     elif printer_state == 5:
         if time.ticks_ms() - printer_state_timer >= 100:
             printer_state_timer = time.ticks_ms()
@@ -325,7 +332,7 @@ while True:
         if time.ticks_ms() - printer_state_timer >= wait_rolling_more_time:
             printer_state = 8
             print("state 7")
-            motor1_controller.active(1)
+            motor1_controller.active(0)
             motor2_controller.active(1)
             printer_state_timer = time.ticks_ms()
     elif printer_state == 8:

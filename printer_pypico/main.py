@@ -73,7 +73,7 @@ except:
     on_delay = 700
     slap_up_time= 75
     wait_rolling_more_time = 50
-    slap_down_time = 60
+    slap_down_time = 70
     if show_debug:
         print("init fail")
 #======================================================================================================
@@ -309,12 +309,17 @@ while True:
         else:
             if duo_switch.value() == 1:
                 print("state 4")
-                printer_state = 5
+                printer_state = 44
                 printer_state_timer = time.ticks_ms()
-                motor1_controller.active(0)
+                #motor1_controller.active(0)
                 motor2_controller.active(0)
                 set_slap_motor_down()
                 set_roller_motor_forward()
+    elif printer_state == 44:
+        if time.ticks_ms() - printer_state_timer >= 50:
+            printer_state_timer = time.ticks_ms()
+            motor1_controller.active(0)
+            printer_state = 5            
     elif printer_state == 5:
         if time.ticks_ms() - printer_state_timer >= 100:
             printer_state_timer = time.ticks_ms()

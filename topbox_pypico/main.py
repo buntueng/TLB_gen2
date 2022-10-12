@@ -112,6 +112,7 @@ def initial_io():
     silo3_dir_pin.value(0)
     silo4_dir_pin.value(0)
 
+
 def resp_485(message):
     resp_message = device_id + message
     device_link.write(bytes( ord(ch) for ch in resp_message))
@@ -205,7 +206,7 @@ while True:
                 motor_state = 5
                 motor_timer = time.ticks_ms()
         elif motor_state == 5:
-            if time.ticks_ms()-motor_timer >= 1000:
+            if time.ticks_ms()-motor_timer >= 200:
                 off_motor()
                 motor_state = 0
                 motor_timer = time.ticks_ms()

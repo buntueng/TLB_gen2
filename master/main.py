@@ -38,8 +38,8 @@ prox2_pin = Pin(11,Pin.IN)
 prox3_pin = Pin(12,Pin.IN)
 prox4_pin = Pin(13,Pin.IN)
 
-roller_limit_pin = Pin(15,Pin.IN,Pin.PULL_UP)
-front_and_back_limit_pin = Pin(14,Pin.IN,Pin.PULL_UP)
+roller_limit_pin = Pin(14,Pin.IN,Pin.PULL_UP)
+front_and_back_limit_pin = Pin(15,Pin.IN,Pin.PULL_UP)
 printer_limit_pin = Pin(22,Pin.IN)
 
 tube_drop_pin = Pin(6,Pin.IN)
@@ -207,8 +207,8 @@ def run_sliding_motor_step2():
     wrap()
 
 
-sliding_motor = rp2.StateMachine(0, run_sliding_motor, freq=2800000, set_base=Pin(16))      # GPIO16 => pulse, GPIO17 => direction //2600000
-rolling_motor = rp2.StateMachine(1, run_roller_motor, freq=1500000, set_base=Pin(18))      # GPIO18 => pulse, GPIO19 => direction
+sliding_motor = rp2.StateMachine(0, run_sliding_motor, freq=3000000, set_base=Pin(16))      # GPIO16 => pulse, GPIO17 => direction //2600000
+rolling_motor = rp2.StateMachine(1, run_roller_motor, freq=2500000, set_base=Pin(18))      # GPIO18 => pulse, GPIO19 => direction
 rolling_motor.active(0)
 sliding_motor.active(0)
 rolling_motor_dir_pin.value(1)
@@ -368,12 +368,12 @@ while True:
                             Off_sliding()
                             message = "move sliding backward"
                         elif pc_command[2] == '3':
-                            On_rolling()
+                            On_sliding()
                             rolling_motor_dir_pin.value(1)
                             rolling_motor.active(1)
                             time.sleep(1)
                             rolling_motor.active(0)
-                            Off_rolling()
+                            Off_sliding()
                             message = "run rolling motor"
                         elif pc_command[2] == '4':
                             on_solenoid1()
@@ -456,7 +456,7 @@ while True:
                 run_printer_controller()
                 main_state = 1
             elif main_state == 1:
-                if time.ticks_ms() - main_state_timer >= 20:                # wait 20 ms
+                if time.ticks_ms() - main_state_timer >= 100:                # wait 20 ms
                     main_state = 2
                 if printer_retry >= 5:
                     main_state = 200
@@ -630,7 +630,7 @@ while True:
                     device_resp_message = ""
                     resp_flag = False
                 else:
-                    if check_printer_state_counter >= 20:
+                    if check_printer_state_counter >= 60:
                         main_state = 206
                         Off_rolling()
                         rolling_motor.active(0)
@@ -644,7 +644,7 @@ while True:
                     sliding_motor.active(1)
                     main_state = 30
             elif main_state == 30:                              # reach the sticker roller
-                if roller_limit_pin.value() == 1:
+                if roller_limit_pin.value() == 0:
                     sliding_motor.active(0)
                     set_sliding_backward()
                     clear_printer_controller()

@@ -39,10 +39,12 @@ void setup() {
 
 void loop()
 {
-  mySerial.println(main_state);
   // ========= get input sensors ===========
   tube_drop_logic = digitalRead(tube_detect_pin1) && digitalRead(tube_detect_pin2) && digitalRead(tube_detect_pin3);
   sticker_detect_logic = digitalRead(sticker_detect_pin);
+  mySerial.print(tube_drop_logic);
+  mySerial.print(",");
+  mySerial.println(sticker_detect_logic);
   //========================================
   digitalWrite(tube_detect_pin,tube_drop_logic);
   digitalWrite(sticker_detect_pin,sticker_detect_logic);

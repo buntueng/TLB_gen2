@@ -146,29 +146,29 @@ while True:
                 elif master_command[1] == '1':
                     current_silo = 1
                     run_motor_flag = True
-                    message = "OK\n"
-                    print("BOX1")
+                    message = "Box1\n"
+                    print("BoX1")
                     resp_485(message=message)   
 
                 elif master_command[1] == '2':
                     current_silo = 2
                     run_motor_flag = True
-                    message = "OK\n"
-                    print("BOX2")
+                    message = "Box2\n"
+                    print("BoX2")
                     resp_485(message=message)
                 
                 elif master_command[1] == '3':
                     current_silo = 3
                     run_motor_flag = True
-                    message = "OK\n"
-                    print("BOX3")
+                    message = "Box3\n"
+                    print("BoX3")
                     resp_485(message=message)
 
                 elif master_command[1] == '4':
                     current_silo = 4
                     run_motor_flag = True
-                    message = "OK\n"
-                    print("BOX4")
+                    message = "Box4\n"
+                    print("BoX4")
                     resp_485(message=message)
 
                 elif master_command[1] == '0':         # turnoff all motors

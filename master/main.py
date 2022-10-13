@@ -119,7 +119,7 @@ def run_silo(silo_number):
     device_link.write(bytes( ord(ch) for ch in message))
 
 def stop_silo():
-    message = '2s0\n'
+    message = '20\n'
     device_link.write( bytes( ord(ch) for ch in message))
 
 def check_printer_state():
@@ -226,7 +226,9 @@ while True:
     # get proximeter sensors
     box_location = read_prox()
     # check tube drop status
-    # print(tube_drop_pin.value(), +sticker_detect_pin.value())
+    #print(tube_drop_pin.value(), +sticker_detect_pin.value())
+    # print(main_state)
+    # time.sleep(0.1)
     # time.sleep(0.2)
     if tube_drop_pin.value() == 0:
         tube_drop_status = True
@@ -379,17 +381,17 @@ while True:
                             on_solenoid1()
                             time.sleep(0.2)
                             off_solenoid1()
-                            message = "on_solinoid1"    
+                            message = "on_solinoid_Locktube"    
                         elif pc_command[2] =='5':
                             on_solenoid2()
                             time.sleep(0.2)
                             off_solenoid2()
-                            message = "on_solinoid2"
+                            message = "on_solinoid_Filp_tube"
                         elif pc_command[2] =='6':
                             on_solenoid3()
                             time.sleep(0.2)
                             off_solenoid3()
-                            message = "on_solinoid3"
+                            message = "on_solinoid_Releass_Tube"
                         elif pc_command[2]=='7':
                             On_sliding()
                             On_rolling()
@@ -561,7 +563,7 @@ while True:
                         device_resp_message = ""
             elif main_state == 16:
                 if time.ticks_ms() - main_state_timer >= 200:
-                    # off_solenoid1()
+                    off_solenoid1()
                     main_state = 17
             elif main_state == 17:
                 if sticker_detect_status:
@@ -644,7 +646,7 @@ while True:
                     sliding_motor.active(1)
                     main_state = 30
             elif main_state == 30:                              # reach the sticker roller
-                if roller_limit_pin.value() == 0:
+                if roller_limit_pin.value() == 1:
                     sliding_motor.active(0)
                     set_sliding_backward()
                     clear_printer_controller()

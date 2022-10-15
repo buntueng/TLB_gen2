@@ -73,7 +73,7 @@ except:
     on_delay = 700
     slap_up_time= 75
     wait_rolling_more_time = 50
-    slap_down_time = 70
+    slap_down_time = 55
     if show_debug:
         print("init fail")
 #======================================================================================================

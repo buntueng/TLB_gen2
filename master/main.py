@@ -371,6 +371,11 @@ while True:
                             message = "move sliding backward"
                         elif pc_command[2] == '3':
                             On_sliding()
+                            rolling_motor_dir_pin.value(0)
+                            rolling_motor.active(1)
+                            time.sleep_ms(100)
+                            rolling_motor.active(0)
+                            time.sleep_ms(10)
                             rolling_motor_dir_pin.value(1)
                             rolling_motor.active(1)
                             time.sleep(1)
@@ -610,6 +615,7 @@ while True:
                 On_rolling()
                 sliding_motor.active(0)
                 rolling_motor.active(1)
+                rolling_motor_dir_pin.value(0)
                 resp_flag = False
                 device_resp_message = ""
                 check_printer_state()
@@ -648,10 +654,16 @@ while True:
             elif main_state == 30:                              # reach the sticker roller
                 if roller_limit_pin.value() == 1:
                     sliding_motor.active(0)
+                    #rolling_motor_dir_pin.value(1)
                     set_sliding_backward()
                     clear_printer_controller()
                     main_state_timer = time.ticks_ms()
-                    main_state = 31
+                    main_state = 300
+            elif main_state == 300:
+                if time.ticks_ms() - main_state_timer >= 20:
+                    rolling_motor_dir_pin.value(1)
+                    main_state_timer = time.ticks_ms()
+                    main_state = 31        
             elif main_state == 31:
                 if time.ticks_ms()-main_state_timer >= 500:
                     sliding_motor.active(1)

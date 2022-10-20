@@ -661,7 +661,7 @@ while True:
                     main_state = 300
             elif main_state == 300:
                 if time.ticks_ms() - main_state_timer >= 20:
-                    rolling_motor_dir_pin.value(1)
+                    rolling_motor_dir_pin.value(1) #edit
                     main_state_timer = time.ticks_ms()
                     main_state = 31        
             elif main_state == 31:

@@ -668,8 +668,8 @@ while True:
                 if time.ticks_ms()-main_state_timer >= 500:
                     sliding_motor.active(1)
                     rolling_motor.active(0)
-                    on_solenoid1()
-                    on_solenoid3()
+                    #on_solenoid1()
+                    #on_solenoid3()
                     Off_rolling()
                     main_state_timer = time.ticks_ms()
                     main_state = 32
@@ -689,9 +689,16 @@ while True:
                     off_solenoid3()
                     sliding_motor.active(1)
                     main_state = 34
+                    main_state_timer = time.ticks_ms()
             elif main_state == 34:
-                if box_location == 4:
-                    main_state = 35
+                if time.ticks_ms() - main_state_timer >= 100:           # waiting time back to silo 4
+                    if box_location == 4:
+                        main_state = 35
+                    else:
+                        main_state_timer = time.ticks_ms()
+                        sliding_motor.active(0)
+                        set_sliding_forward()
+                        main_state = 29
                     # ====== clear printer state
                     #clear_printer_controller()
             elif main_state == 35:

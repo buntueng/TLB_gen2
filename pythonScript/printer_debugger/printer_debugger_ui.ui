@@ -1,0 +1,194 @@
+<?xml version='1.0' encoding='utf-8'?>
+<interface version="1.2">
+  <object class="tk.Toplevel" id="mainWindow">
+    <property name="height">400</property>
+    <property name="resizable">none</property>
+    <property name="title" translatable="yes">printer module tester</property>
+    <property name="width">700</property>
+    <child>
+      <object class="ttk.Label" id="serial_port_label">
+        <property name="text" translatable="yes">Serial port</property>
+        <layout manager="grid">
+          <property name="column">0</property>
+          <property name="padx">10</property>
+          <property name="pady">10</property>
+          <property name="row">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="ttk.Label" id="response_label">
+        <property name="text" translatable="yes">Response</property>
+        <layout manager="grid">
+          <property name="column">0</property>
+          <property name="pady">0 10</property>
+          <property name="row">2</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="ttk.Combobox" id="serial_port_combobox">
+        <property name="width">10</property>
+        <layout manager="grid">
+          <property name="column">1</property>
+          <property name="padx">10</property>
+          <property name="row">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Button" id="connect_button">
+        <property name="command" type="command" cbtype="simple">connect_button_pressed</property>
+        <property name="height">2</property>
+        <property name="justify">center</property>
+        <property name="state">normal</property>
+        <property name="text" translatable="yes">Connect</property>
+        <property name="width">15</property>
+        <layout manager="grid">
+          <property name="column">2</property>
+          <property name="padx">10</property>
+          <property name="pady">10</property>
+          <property name="row">0</property>
+          <property name="rowspan">2</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Button" id="disconnect_button">
+        <property name="command" type="command" cbtype="simple">disconnect_button_pressed</property>
+        <property name="height">2</property>
+        <property name="state">disabled</property>
+        <property name="text" translatable="yes">disconnect</property>
+        <property name="width">15</property>
+        <layout manager="grid">
+          <property name="column">3</property>
+          <property name="padx">0 10</property>
+          <property name="pady">10</property>
+          <property name="row">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Text" id="response_text">
+        <property name="height">20</property>
+        <property name="state">disabled</property>
+        <property name="width">70</property>
+        <layout manager="grid">
+          <property name="column">0</property>
+          <property name="columnspan">12</property>
+          <property name="padx">20</property>
+          <property name="pady">0 20</property>
+          <property name="row">3</property>
+          <property name="rowspan">7</property>
+          <property name="sticky">ew</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Button" id="fn1_button">
+        <property name="command" type="command" cbtype="simple">fn1_button_pressed</property>
+        <property name="height">2</property>
+        <property name="state">disabled</property>
+        <property name="text" translatable="yes">FN1</property>
+        <property name="width">15</property>
+        <layout manager="grid">
+          <property name="column">13</property>
+          <property name="padx">0 20</property>
+          <property name="row">3</property>
+          <property name="sticky">n</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Button" id="fn2_button">
+        <property name="command" type="command" cbtype="simple">fn2_button_pressed</property>
+        <property name="height">2</property>
+        <property name="state">disabled</property>
+        <property name="text" translatable="yes">FN2</property>
+        <property name="width">15</property>
+        <layout manager="grid">
+          <property name="column">13</property>
+          <property name="padx">0 20</property>
+          <property name="row">4</property>
+          <property name="sticky">n</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Button" id="fn3_button">
+        <property name="command" type="command" cbtype="simple">fn3_button_pressed</property>
+        <property name="height">2</property>
+        <property name="state">disabled</property>
+        <property name="text" translatable="yes">FN3</property>
+        <property name="width">15</property>
+        <layout manager="grid">
+          <property name="column">13</property>
+          <property name="padx">0 20</property>
+          <property name="row">5</property>
+          <property name="sticky">n</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Button" id="fn4_button">
+        <property name="command" type="command" cbtype="simple">fn4_button_pressed</property>
+        <property name="height">2</property>
+        <property name="state">disabled</property>
+        <property name="text" translatable="yes">FN4</property>
+        <property name="width">15</property>
+        <layout manager="grid">
+          <property name="column">13</property>
+          <property name="padx">0 20</property>
+          <property name="row">6</property>
+          <property name="sticky">n</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Button" id="fn5_button">
+        <property name="command" type="command" cbtype="simple">fn5_button_pressed</property>
+        <property name="height">2</property>
+        <property name="state">disabled</property>
+        <property name="text" translatable="yes">FN5</property>
+        <property name="width">15</property>
+        <layout manager="grid">
+          <property name="column">13</property>
+          <property name="padx">0 20</property>
+          <property name="row">7</property>
+          <property name="sticky">n</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Button" id="fn6_button">
+        <property name="command" type="command" cbtype="simple">fn6_button_pressed</property>
+        <property name="height">2</property>
+        <property name="state">disabled</property>
+        <property name="text" translatable="yes">FN6</property>
+        <property name="width">15</property>
+        <layout manager="grid">
+          <property name="column">13</property>
+          <property name="padx">0 20</property>
+          <property name="row">8</property>
+          <property name="sticky">n</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="tk.Button" id="fn7_button">
+        <property name="command" type="command" cbtype="simple">fn7_button_pressed</property>
+        <property name="height">2</property>
+        <property name="state">disabled</property>
+        <property name="text" translatable="yes">FN7</property>
+        <property name="width">15</property>
+        <layout manager="grid">
+          <property name="column">13</property>
+          <property name="padx">0 20</property>
+          <property name="pady">0 10</property>
+          <property name="row">9</property>
+          <property name="sticky">n</property>
+        </layout>
+      </object>
+    </child>
+  </object>
+</interface>

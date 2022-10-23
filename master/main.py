@@ -694,7 +694,7 @@ while True:
                 if box_location == 4:
                     main_state = 35
                 else:
-                    if time.ticks_ms() - main_state_timer >= 100:           # waiting time back to silo 4
+                    if time.ticks_ms() - main_state_timer >= 400:           # waiting time back to silo 4
                         main_state_timer = time.ticks_ms()
                         sliding_motor.active(0)
                         set_sliding_forward()

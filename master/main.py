@@ -340,6 +340,8 @@ while True:
             clear_tube_state = 7
         elif clear_tube_state == 7:
             if box_location == 1:
+                sliding_motor.active(0)
+                set_sliding_forward()
                 clear_tube_state = 8
                 clear_tube_flag = False
 

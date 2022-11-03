@@ -27,12 +27,6 @@ move_origin = True
 move_origin_state = 0
 move_origin_timer = 0
 
-
-# clear tube on initial
-clear_tube_flag = False
-clear_tube_timer = 0
-clear_tube_state = 0
-
 fast_sliding_motor = True
 
 relay_rolling_pin = Pin(21,Pin.OUT)
@@ -228,6 +222,11 @@ device_resp_message = ""
 move_origin = True
 move_origin_state = 0
 
+# clear tube on initial
+clear_tube_flag = False
+clear_tube_timer = 0
+clear_tube_state = 0
+
 while True:
     # get proximeter sensors
     box_location = read_prox()
@@ -263,9 +262,12 @@ while True:
         elif move_origin_state == 1:
             if front_and_back_limit_pin.value() == 0:
                 move_origin_state = 100
-                move_origin = False
+                #move_origin = False
                 Off_sliding()
                 sliding_motor.active(0)
+                clear_tube_flag = True
+                clear_tube_state = 0
+                move_origin_state = 3
             else:
                 if time.ticks_ms() - move_origin_timer >= 3000:
                     move_origin_state = 102
@@ -275,7 +277,7 @@ while True:
                 else:
                     if box_location == 1:
                         move_origin_state = 2
-                        move_origin = False
+                        #move_origin = False
                         Off_sliding()
                         sliding_motor.active(0)
                     elif box_location == 0:
@@ -290,6 +292,9 @@ while True:
             # ========= set clear tube state and flag
             clear_tube_flag = True
             clear_tube_state = 0
+            move_origin_state = 3
+        elif move_origin_state == 3:
+            move_origin = False
         elif move_origin_state == 100:                  # sliding motor hits limit switch
             Off_sliding()
             pass
@@ -302,11 +307,11 @@ while True:
     #=========================================
     if clear_tube_flag:
         if clear_tube_state == 0:
-            set_sliding_forward()
             clear_tube_timer = time.ticks_ms()
-            clear_tube_state = 1
+            clear_tube_state = 10
         elif clear_tube_state == 1:
             if time.ticks_ms() - clear_tube_timer >= 100:
+                On_sliding()
                 sliding_motor.active(1)
                 clear_tube_state = 2
         elif clear_tube_state == 2:
@@ -341,9 +346,20 @@ while True:
         elif clear_tube_state == 7:
             if box_location == 1:
                 sliding_motor.active(0)
-                set_sliding_forward()
+                Off_sliding()
+                set_sliding_backward()
                 clear_tube_state = 8
                 clear_tube_flag = False
+
+        elif clear_tube_state == 10:
+            if time.ticks_ms() - clear_tube_timer >= 200:
+                set_sliding_forward()
+                clear_tube_state = 11
+                clear_tube_timer = time.ticks_ms()
+        elif clear_tube_state == 11:
+            if time.ticks_ms() - clear_tube_timer >= 200:
+                clear_tube_state = 1
+                clear_tube_timer = time.ticks_ms()
 
     # =========== command from pc ============
     if(pc_link.any()):

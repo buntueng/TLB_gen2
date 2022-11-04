@@ -28,7 +28,7 @@ move_origin_state = 0
 move_origin_timer = 0
 
 fast_sliding_motor = True
-
+#======================================= config pin ====================================
 relay_rolling_pin = Pin(21,Pin.OUT)
 relay_sliding_pin = Pin(20,Pin.OUT)
 rolling_motor_dir_pin = Pin(19,Pin.OUT)

@@ -222,6 +222,11 @@ device_resp_message = ""
 move_origin = True
 move_origin_state = 0
 
+# clear tube on initial
+clear_tube_flag = False
+clear_tube_timer = 0
+clear_tube_state = 0
+
 while True:
     # get proximeter sensors
     box_location = read_prox()
@@ -257,9 +262,12 @@ while True:
         elif move_origin_state == 1:
             if front_and_back_limit_pin.value() == 0:
                 move_origin_state = 100
-                move_origin = False
+                #move_origin = False
                 Off_sliding()
                 sliding_motor.active(0)
+                clear_tube_flag = True
+                clear_tube_state = 0
+                move_origin_state = 3
             else:
                 if time.ticks_ms() - move_origin_timer >= 3000:
                     move_origin_state = 102
@@ -269,7 +277,7 @@ while True:
                 else:
                     if box_location == 1:
                         move_origin_state = 2
-                        move_origin = False
+                        #move_origin = False
                         Off_sliding()
                         sliding_motor.active(0)
                     elif box_location == 0:
@@ -281,7 +289,12 @@ while True:
                         pass
         elif move_origin_state == 2:                    # sliding motor is origin
             Off_sliding()
-            pass
+            # ========= set clear tube state and flag
+            clear_tube_flag = True
+            clear_tube_state = 0
+            move_origin_state = 3
+        elif move_origin_state == 3:
+            move_origin = False
         elif move_origin_state == 100:                  # sliding motor hits limit switch
             Off_sliding()
             pass
@@ -291,6 +304,63 @@ while True:
         elif move_origin_state == 102:                  # sliding motor can not run
             Off_sliding()
             pass
+    #=========================================
+    if clear_tube_flag:
+        if clear_tube_state == 0:
+            clear_tube_timer = time.ticks_ms()
+            clear_tube_state = 10
+        elif clear_tube_state == 1:
+            if time.ticks_ms() - clear_tube_timer >= 100:
+                On_sliding()
+                sliding_motor.active(1)
+                clear_tube_state = 2
+        elif clear_tube_state == 2:
+            if roller_limit_pin.value() == 1:
+                sliding_motor.active(0)
+                on_solenoid1()
+                on_solenoid3()
+                clear_tube_timer = time.ticks_ms()
+                clear_tube_state = 3
+                set_sliding_backward()
+        elif clear_tube_state == 3:
+            if time.ticks_ms() - clear_tube_timer >= 300:
+                clear_tube_state = 4
+                off_solenoid1()
+                off_solenoid3()
+                clear_tube_timer = time.ticks_ms()
+        elif clear_tube_state == 4:
+            if time.ticks_ms() - clear_tube_timer >= 300:
+                clear_tube_state = 5
+                on_solenoid1()
+                on_solenoid3()
+                clear_tube_timer = time.ticks_ms()
+        elif clear_tube_state == 5:
+            if time.ticks_ms() - clear_tube_timer >= 300:
+                clear_tube_state = 6
+                off_solenoid1()
+                off_solenoid3()
+                clear_tube_timer = time.ticks_ms()
+        elif clear_tube_state == 6:
+            sliding_motor.active(1)
+            clear_tube_state = 7
+        elif clear_tube_state == 7:
+            if box_location == 1:
+                sliding_motor.active(0)
+                Off_sliding()
+                set_sliding_backward()
+                clear_tube_state = 8
+                clear_tube_flag = False
+
+        elif clear_tube_state == 10:
+            if time.ticks_ms() - clear_tube_timer >= 200:
+                set_sliding_forward()
+                clear_tube_state = 11
+                clear_tube_timer = time.ticks_ms()
+        elif clear_tube_state == 11:
+            if time.ticks_ms() - clear_tube_timer >= 200:
+                clear_tube_state = 1
+                clear_tube_timer = time.ticks_ms()
+
     # =========== command from pc ============
     if(pc_link.any()):
         try:
@@ -347,7 +417,10 @@ while True:
                         move_origin = True
                         move_origin_state = 0
                         message = "Go origin"
-                        pc_response(resp_message=message)           
+                        pc_response(resp_message=message)
+                    elif pc_command[1] == 'x':
+                        message = "x command"
+                        pc_response(message)           
                 elif len(pc_command) == 3:
                     if pc_command[1] == 'd':
                         message = ""
@@ -567,7 +640,7 @@ while True:
                         resp_flag = False
                         device_resp_message = ""
             elif main_state == 16:
-                if time.ticks_ms() - main_state_timer >= 200:
+                if time.ticks_ms() - main_state_timer >= 400:
                     off_solenoid1()
                     main_state = 17
             elif main_state == 17:

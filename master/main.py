@@ -613,7 +613,7 @@ while True:
                     resp_flag = False
                     device_resp_message = ""
                 else:
-                    if silo_retry >= 5:
+                    if silo_retry >= 50:
                         main_state = 204
                     else:
                         silo_retry = silo_retry + 1
@@ -733,7 +733,7 @@ while True:
                     main_state_timer = time.ticks_ms()
                     main_state = 300
             elif main_state == 300:
-                if time.ticks_ms() - main_state_timer >= 20:
+                if time.ticks_ms() - main_state_timer >= 1:
                     rolling_motor_dir_pin.value(1) #edit
                     main_state_timer = time.ticks_ms()
                     main_state = 31        

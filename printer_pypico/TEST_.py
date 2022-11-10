@@ -71,9 +71,9 @@ try:
         print("init ok")
 except:
     on_delay = 700
-    slap_up_time= 60
+    slap_up_time= 75
     wait_rolling_more_time = 50
-    slap_down_time = 45
+    slap_down_time = 70
     if show_debug:
         print("init fail")
 #======================================================================================================
@@ -445,7 +445,7 @@ while True:
             Off_slab()
             origin_state_timer = time.ticks_ms()
     elif origin_state == 3:
-        if time.ticks_ms() - origin_state_timer >= 100:
+        if time.ticks_ms() - origin_state_timer >= 200:
             motor1_controller.active(0)
             Off_roller()
             #Off_slab()

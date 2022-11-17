@@ -317,11 +317,21 @@ while True:
         elif clear_tube_state == 2:
             if roller_limit_pin.value() == 1:
                 sliding_motor.active(0)
+                clear_tube_timer = time.ticks_ms()
+                clear_tube_state = 22
+                set_sliding_backward()
+        elif clear_tube_state == 22:
+            if time.ticks_ms() - clear_tube_timer >= 10:   
+                sliding_motor.active(1)  
+                clear_tube_timer = time.ticks_ms() 
                 on_solenoid1()
                 on_solenoid3()
+                clear_tube_state = 23   
+        elif clear_tube_state == 23:
+            if time.ticks_ms() - clear_tube_timer >= 70:
+                sliding_motor.active(0)
                 clear_tube_timer = time.ticks_ms()
                 clear_tube_state = 3
-                set_sliding_backward()
         elif clear_tube_state == 3:
             if time.ticks_ms() - clear_tube_timer >= 300:
                 clear_tube_state = 4
@@ -360,6 +370,8 @@ while True:
             if time.ticks_ms() - clear_tube_timer >= 200:
                 clear_tube_state = 1
                 clear_tube_timer = time.ticks_ms()
+
+
 
     # =========== command from pc ============
     if(pc_link.any()):

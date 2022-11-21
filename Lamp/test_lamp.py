@@ -2,10 +2,12 @@ import time
 from pymodbus.client import ModbusSerialClient as ModbusClient
 from mysql.connector import connect 
 
+time.sleep(3)
 client = ModbusClient(method='rtu',port='COM8',stopbitd=1,bytesize=8,parity='N',baudrate=9600,timeout=1)
 connection = client.connect()
 db_connector =  connect(host="localhost", user="root", port = 3333, passwd="edgelabeling555",  db="sbj",  charset="utf8"  )
 database_cursor = db_connector.cursor()
+time.sleep(20)
 
 def read_cmd():
     result_list = []

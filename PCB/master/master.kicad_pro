@@ -45,7 +45,7 @@
         "silk_text_upright": false,
         "zones": {
           "45_degree_only": false,
-          "min_clearance": 0.508
+          "min_clearance": 1.016
         }
       },
       "diff_pair_dimensions": [
@@ -121,12 +121,35 @@
       "track_widths": [
         0.0,
         0.381,
-        0.635
+        0.762,
+        1.27,
+        1.905,
+        2.54
       ],
       "via_dimensions": [
         {
           "diameter": 0.0,
           "drill": 0.0
+        },
+        {
+          "diameter": 0.381,
+          "drill": 0.254
+        },
+        {
+          "diameter": 0.762,
+          "drill": 0.508
+        },
+        {
+          "diameter": 1.27,
+          "drill": 0.762
+        },
+        {
+          "diameter": 1.778,
+          "drill": 1.143
+        },
+        {
+          "diameter": 2.54,
+          "drill": 1.905
         }
       ],
       "zones_allow_external_fillets": false,
@@ -348,7 +371,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "master.kicad_pro",
+    "filename": "Master.kicad_pro",
     "version": 1
   },
   "net_settings": {
@@ -427,7 +450,7 @@
   },
   "sheets": [
     [
-      "9538e4ed-27e6-4c37-b989-9859dc0d49e8",
+      "bc71d3ec-8c2a-4fbe-b866-f4e55b90dbaa",
       ""
     ]
   ],

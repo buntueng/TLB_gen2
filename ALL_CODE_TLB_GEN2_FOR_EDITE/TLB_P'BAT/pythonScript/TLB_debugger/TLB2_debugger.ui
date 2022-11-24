@@ -1,0 +1,340 @@
+<?xml version='1.0' encoding='utf-8'?>
+<interface version="1.2">
+  <object class="tk.Toplevel" id="toplevel1">
+    <property name="geometry">1024x768</property>
+    <property name="height">200</property>
+    <property name="resizable">none</property>
+    <property name="title" translatable="yes">TLB gen2 - Debugger</property>
+    <property name="width">200</property>
+    <containerlayout manager="grid">
+      <property name="anchor">center</property>
+    </containerlayout>
+    <child>
+      <object class="ttk.Frame" id="left_frame">
+        <property name="height">768</property>
+        <property name="width">400</property>
+        <layout manager="grid">
+          <property name="column">0</property>
+          <property name="row">0</property>
+          <property name="sticky">ns</property>
+        </layout>
+        <child>
+          <object class="tk.Text" id="status_text">
+            <property name="height">5</property>
+            <property name="state">disabled</property>
+            <property name="width">40</property>
+            <layout manager="grid">
+              <property name="column">0</property>
+              <property name="columnspan">3</property>
+              <property name="padx">10</property>
+              <property name="row">5</property>
+              <property name="sticky">w</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Text" id="pc_command_text">
+            <property name="height">25</property>
+            <property name="width">40</property>
+            <layout manager="grid">
+              <property name="column">0</property>
+              <property name="columnspan">3</property>
+              <property name="padx">10</property>
+              <property name="pady">0 10</property>
+              <property name="row">7</property>
+              <property name="rowspan">15</property>
+              <property name="sticky">w</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Label" id="status_label">
+            <property name="text" translatable="yes">Status</property>
+            <layout manager="grid">
+              <property name="column">0</property>
+              <property name="padx">10</property>
+              <property name="pady">10</property>
+              <property name="row">4</property>
+              <property name="sticky">w</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Label" id="cmd_list_label">
+            <property name="text" translatable="yes">Command</property>
+            <layout manager="grid">
+              <property name="column">0</property>
+              <property name="padx">10</property>
+              <property name="pady">10</property>
+              <property name="row">6</property>
+              <property name="sticky">w</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Button" id="connect_button">
+            <property name="command" type="command" cbtype="simple">connect_button_pressed</property>
+            <property name="text" translatable="yes">connect</property>
+            <property name="width">17</property>
+            <layout manager="grid">
+              <property name="column">2</property>
+              <property name="columnspan">2</property>
+              <property name="padx">20</property>
+              <property name="pady">10 40</property>
+              <property name="row">0</property>
+              <property name="rowspan">5</property>
+              <property name="sticky">ns</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Button" id="load_button">
+            <property name="command" type="command" cbtype="simple">load_button_pressed</property>
+            <property name="state">disabled</property>
+            <property name="text" translatable="yes">LOAD</property>
+            <property name="width">17</property>
+            <layout manager="grid">
+              <property name="column">4</property>
+              <property name="padx">10 0</property>
+              <property name="pady">0 30</property>
+              <property name="row">7</property>
+              <property name="sticky">ns</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Button" id="save_button">
+            <property name="command" type="command" cbtype="simple">save_button_pressed</property>
+            <property name="state">disabled</property>
+            <property name="text" translatable="yes">SAVE</property>
+            <property name="width">17</property>
+            <layout manager="grid">
+              <property name="column">4</property>
+              <property name="padx">10 0</property>
+              <property name="pady">0 30</property>
+              <property name="row">8</property>
+              <property name="sticky">ns</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Button" id="clear_button">
+            <property name="command" type="command" cbtype="simple">clear_button_pressed</property>
+            <property name="state">disabled</property>
+            <property name="text" translatable="yes">CLEAR</property>
+            <property name="width">17</property>
+            <layout manager="grid">
+              <property name="column">4</property>
+              <property name="padx">10 0</property>
+              <property name="pady">0 30</property>
+              <property name="row">9</property>
+              <property name="sticky">ns</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Button" id="run_button">
+            <property name="command" type="command" cbtype="simple">run_button_pressed</property>
+            <property name="state">disabled</property>
+            <property name="text" translatable="yes">RUN</property>
+            <property name="width">17</property>
+            <layout manager="grid">
+              <property name="column">4</property>
+              <property name="padx">10 0</property>
+              <property name="row">10</property>
+              <property name="sticky">ns</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Scrollbar" id="cmd_scrollbar">
+            <property name="orient">vertical</property>
+            <layout manager="grid">
+              <property name="column">3</property>
+              <property name="pady">0 10</property>
+              <property name="row">7</property>
+              <property name="rowspan">15</property>
+              <property name="sticky">nsw</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Scrollbar" id="status_scrollbar">
+            <property name="orient">vertical</property>
+            <layout manager="grid">
+              <property name="column">3</property>
+              <property name="row">5</property>
+              <property name="sticky">nsw</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Label" id="pclink_label">
+            <property name="text" translatable="yes">PC Link</property>
+            <layout manager="grid">
+              <property name="column">0</property>
+              <property name="padx">10</property>
+              <property name="pady">10</property>
+              <property name="row">0</property>
+              <property name="sticky">w</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Combobox" id="pc_port_combobox">
+            <property name="width">15</property>
+            <layout manager="grid">
+              <property name="column">1</property>
+              <property name="row">0</property>
+              <property name="sticky">w</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Label" id="master_node_label">
+            <property name="text" translatable="yes">Master</property>
+            <layout manager="grid">
+              <property name="column">0</property>
+              <property name="padx">10</property>
+              <property name="row">1</property>
+              <property name="sticky">w</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Combobox" id="master_port_combobox">
+            <property name="width">15</property>
+            <layout manager="grid">
+              <property name="column">1</property>
+              <property name="row">1</property>
+              <property name="sticky">w</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Label" id="label3">
+            <property name="text" translatable="yes">Node 1</property>
+            <layout manager="grid">
+              <property name="column">0</property>
+              <property name="padx">10</property>
+              <property name="row">2</property>
+              <property name="sticky">w</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Combobox" id="node1_port_combobox">
+            <property name="width">15</property>
+            <layout manager="grid">
+              <property name="column">1</property>
+              <property name="pady">10</property>
+              <property name="row">2</property>
+              <property name="sticky">w</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Label" id="node2_label">
+            <property name="text" translatable="yes">Node2</property>
+            <layout manager="grid">
+              <property name="column">0</property>
+              <property name="padx">10</property>
+              <property name="row">3</property>
+              <property name="sticky">w</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Combobox" id="node2_port_combobox">
+            <property name="width">15</property>
+            <layout manager="grid">
+              <property name="column">1</property>
+              <property name="row">3</property>
+              <property name="sticky">w</property>
+            </layout>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="ttk.Frame" id="right_frame">
+        <property name="height">768</property>
+        <property name="width">624</property>
+        <layout manager="grid">
+          <property name="column">1</property>
+          <property name="row">0</property>
+          <property name="sticky">n</property>
+        </layout>
+        <child>
+          <object class="tk.Text" id="monitor_text">
+            <property name="height">44</property>
+            <property name="insertunfocussed">none</property>
+            <property name="state">disabled</property>
+            <property name="width">45</property>
+            <layout manager="grid">
+              <property name="column">0</property>
+              <property name="padx">10</property>
+              <property name="pady">0 20</property>
+              <property name="row">1</property>
+              <property name="rowspan">15</property>
+              <property name="sticky">nsw</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Label" id="monitor_label">
+            <property name="text" translatable="yes">หน้าต่าง monitor</property>
+            <layout manager="grid">
+              <property name="column">0</property>
+              <property name="padx">10</property>
+              <property name="pady">10</property>
+              <property name="row">0</property>
+              <property name="sticky">w</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Button" id="clear_monitor_button">
+            <property name="command" type="command" cbtype="simple">clear_monitor_button_pressed</property>
+            <property name="state">disabled</property>
+            <property name="text" translatable="yes">เคลียร์ข้อความ</property>
+            <property name="width">17</property>
+            <layout manager="grid">
+              <property name="column">2</property>
+              <property name="padx">10</property>
+              <property name="pady">0 30</property>
+              <property name="row">1</property>
+              <property name="sticky">nsew</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Button" id="save_monitor_button">
+            <property name="command" type="command" cbtype="simple">save_monitor_button_pressed</property>
+            <property name="state">disabled</property>
+            <property name="text" translatable="yes">บันทึก</property>
+            <property name="width">17</property>
+            <layout manager="grid">
+              <property name="column">2</property>
+              <property name="padx">10</property>
+              <property name="row">2</property>
+              <property name="sticky">nsew</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Scrollbar" id="monitor_scrollbar">
+            <property name="orient">vertical</property>
+            <layout manager="grid">
+              <property name="column">1</property>
+              <property name="pady">0 20</property>
+              <property name="row">1</property>
+              <property name="rowspan">15</property>
+              <property name="sticky">nsw</property>
+            </layout>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

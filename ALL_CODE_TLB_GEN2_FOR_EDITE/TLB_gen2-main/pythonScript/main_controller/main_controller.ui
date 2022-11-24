@@ -1,0 +1,156 @@
+<?xml version='1.0' encoding='utf-8'?>
+<interface version="1.2">
+  <object class="tk.Toplevel" id="toplevel1">
+    <property name="height">200</property>
+    <property name="title" translatable="yes">TLB controller</property>
+    <property name="width">500</property>
+    <child>
+      <object class="ttk.Frame" id="topFrame">
+        <property name="height">100</property>
+        <property name="width">500</property>
+        <layout manager="grid">
+          <property name="column">0</property>
+          <property name="row">0</property>
+          <property name="sticky">ew</property>
+        </layout>
+        <child>
+          <object class="ttk.Entry" id="box1_entry">
+            <property name="justify">center</property>
+            <property name="state">readonly</property>
+            <property name="text" translatable="yes">BOX1</property>
+            <property name="width">15</property>
+            <layout manager="grid">
+              <property name="column">0</property>
+              <property name="padx">30 20</property>
+              <property name="pady">20</property>
+              <property name="row">0</property>
+              <property name="sticky">ew</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Entry" id="box2_entry">
+            <property name="justify">center</property>
+            <property name="state">readonly</property>
+            <property name="text" translatable="yes">BOX2</property>
+            <property name="width">15</property>
+            <layout manager="grid">
+              <property name="column">1</property>
+              <property name="row">0</property>
+              <property name="sticky">ew</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Entry" id="box3_entry">
+            <property name="justify">center</property>
+            <property name="state">readonly</property>
+            <property name="text" translatable="yes">BOX3</property>
+            <property name="width">15</property>
+            <layout manager="grid">
+              <property name="column">2</property>
+              <property name="padx">20</property>
+              <property name="row">0</property>
+              <property name="sticky">ew</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Entry" id="entry4">
+            <property name="justify">center</property>
+            <property name="state">readonly</property>
+            <property name="text" translatable="yes">BOX4</property>
+            <property name="width">15</property>
+            <layout manager="grid">
+              <property name="column">3</property>
+              <property name="padx">0 30</property>
+              <property name="row">0</property>
+              <property name="sticky">ew</property>
+            </layout>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="ttk.Frame" id="middleFrame">
+        <property name="height">100</property>
+        <property name="width">500</property>
+        <layout manager="grid">
+          <property name="column">0</property>
+          <property name="row">1</property>
+          <property name="sticky">ew</property>
+        </layout>
+        <child>
+          <object class="ttk.Label" id="status_label">
+            <property name="justify">left</property>
+            <property name="text" translatable="yes">status</property>
+            <layout manager="grid">
+              <property name="column">0</property>
+              <property name="padx">20</property>
+              <property name="row">0</property>
+              <property name="sticky">w</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Text" id="status_text">
+            <property name="height">5</property>
+            <property name="width">56</property>
+            <layout manager="grid">
+              <property name="column">0</property>
+              <property name="padx">20 5</property>
+              <property name="pady">5</property>
+              <property name="row">1</property>
+            </layout>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="ttk.Frame" id="bottom_frame">
+        <property name="height">500</property>
+        <property name="width">500</property>
+        <layout manager="grid">
+          <property name="column">0</property>
+          <property name="row">2</property>
+          <property name="sticky">ew</property>
+        </layout>
+        <child>
+          <object class="ttk.Label" id="message_label">
+            <property name="text" translatable="yes">Message</property>
+            <layout manager="grid">
+              <property name="column">0</property>
+              <property name="padx">20</property>
+              <property name="pady">5</property>
+              <property name="row">0</property>
+              <property name="sticky">w</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Text" id="message_text">
+            <property name="height">15</property>
+            <property name="width">56</property>
+            <layout manager="grid">
+              <property name="column">0</property>
+              <property name="padx">20 5</property>
+              <property name="pady">5 15</property>
+              <property name="row">1</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Scrollbar" id="message_scrollbar">
+            <property name="orient">vertical</property>
+            <layout manager="grid">
+              <property name="column">1</property>
+              <property name="pady">5</property>
+              <property name="row">1</property>
+              <property name="sticky">ns</property>
+            </layout>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

@@ -699,8 +699,8 @@ while True:
             elif main_state == 26:
                 On_rolling()
                 sliding_motor.active(0)
-                rolling_motor.active(1)
-                rolling_motor_dir_pin.value(0)
+                rolling_motor.active(0)
+                rolling_motor_dir_pin.value(1)
                 resp_flag = False
                 device_resp_message = ""
                 check_printer_state()
@@ -738,6 +738,7 @@ while True:
                     main_state = 30
             elif main_state == 30:                              # reach the sticker roller
                 if roller_limit_pin.value() == 1:
+                    rolling_motor.active(1)
                     sliding_motor.active(0)
                     #rolling_motor_dir_pin.value(1)
                     set_sliding_backward()

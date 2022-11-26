@@ -659,7 +659,7 @@ while True:
                         resp_flag = False
                         device_resp_message = ""
             elif main_state == 16:
-                if time.ticks_ms() - main_state_timer >= 400:
+                if time.ticks_ms() - main_state_timer >= 200:
                     off_solenoid1()
                     main_state = 17
             elif main_state == 17:
@@ -792,6 +792,8 @@ while True:
                     main_state = 34
                     main_state_timer = time.ticks_ms()
             elif main_state == 34:
+                if time.ticks_ms() - main_state_timer >= 200:
+                    off_solenoid1()
                 if box_location == 4 or time.ticks_ms() - main_state_timer >= 400:
                     if box_location == 4:
                         main_state = 35
@@ -805,7 +807,7 @@ while True:
                     main_state = 36
             elif main_state == 36:
                 if box_location == 3:
-                    off_solenoid1()
+                    # off_solenoid1()
                     main_state = 37
             elif main_state == 37:
                 if box_location == 5:

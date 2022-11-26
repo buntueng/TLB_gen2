@@ -177,6 +177,8 @@ def check_running_state():
         message = "printer module not response"
     elif main_state == 207:
         message = "try condition error"
+    elif main_state == 208:
+        message = "running_error"
     return message + "\n"
 
 @rp2.asm_pio(set_init=rp2.PIO.OUT_LOW)
@@ -255,10 +257,10 @@ while True:
                 sliding_motor.active(0)
             else:
                 On_sliding()
-                move_origin_state = 1
+                move_origin_state = 200
                 set_sliding_backward()
-                sliding_motor.active(1)
                 move_origin_timer = time.ticks_ms()
+
         elif move_origin_state == 1:
             if front_and_back_limit_pin.value() == 0:
                 move_origin_state = 100
@@ -304,6 +306,11 @@ while True:
         elif move_origin_state == 102:                  # sliding motor can not run
             Off_sliding()
             pass
+        elif move_origin_state == 200:
+            if time.ticks_ms()- move_origin_timer >= 50:
+                sliding_motor.active(1)
+                move_origin_state = 1
+                move_origin_timer = time.ticks_ms()
     #=========================================
     if clear_tube_flag:
         if clear_tube_state == 0:
@@ -734,9 +741,17 @@ while True:
             elif main_state == 29:
                 if time.ticks_ms() - main_state_timer >= 20:
                     # run sliding motor in second speed
+                    main_state_timer = time.ticks_ms()
                     sliding_motor.active(1)
                     main_state = 30
             elif main_state == 30:                              # reach the sticker roller
+                if time.ticks_ms() - main_state_timer >= 1000:
+                    main_state = 208
+                    sliding_motor.active(0)
+                    move_origin = True
+                    move_origin_state = 0
+                    Off_sliding()
+                    Off_rolling()
                 if roller_limit_pin.value() == 1:
                     rolling_motor.active(1)
                     sliding_motor.active(0)
@@ -864,6 +879,7 @@ while True:
         #main_state == 205:             # blood tube is jamming
         #main_state == 206:             # printer module not response
         #main_state == 207:              # there is an error from try condition
+        #main_state == 208:             # can not go to roller
 
 
 

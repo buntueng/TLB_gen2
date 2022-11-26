@@ -207,7 +207,7 @@ def run_sliding_motor_step2():
     wrap()
 
 
-sliding_motor = rp2.StateMachine(0, run_sliding_motor, freq=2800000, set_base=Pin(16))      # GPIO16 => pulse, GPIO17 => direction //2600000
+sliding_motor = rp2.StateMachine(0, run_sliding_motor, freq=3000000, set_base=Pin(16))      # GPIO16 => pulse, GPIO17 => direction //2600000
 rolling_motor = rp2.StateMachine(1, run_roller_motor, freq=2500000, set_base=Pin(18))      # GPIO18 => pulse, GPIO19 => direction
 rolling_motor.active(0)
 sliding_motor.active(0)
@@ -864,6 +864,7 @@ while True:
         #main_state == 205:             # blood tube is jamming
         #main_state == 206:             # printer module not response
         #main_state == 207:              # there is an error from try condition
+
 
 
 

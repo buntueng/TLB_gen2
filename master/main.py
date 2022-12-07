@@ -280,8 +280,8 @@ while True:
                     if box_location == 1:
                         move_origin_state = 2
                         #move_origin = False
-                        Off_sliding()
-                        sliding_motor.active(0)
+                        # Off_sliding()
+                        # sliding_motor.active(0)
                     elif box_location == 0:
                         move_origin_state = 101
                         move_origin = False
@@ -290,11 +290,24 @@ while True:
                     else:
                         pass
         elif move_origin_state == 2:                    # sliding motor is origin
-            Off_sliding()
+            move_origin_timer = time.ticks_ms()
+            set_sliding_backward()
+            sliding_motor.active(1)
+            On_sliding()
+            move_origin_state = 222
+            # Off_sliding()
+
             # ========= set clear tube state and flag
-            clear_tube_flag = True
-            clear_tube_state = 0
-            move_origin_state = 3
+            # clear_tube_flag = True
+            # clear_tube_state = 0
+            # move_origin_state = 3
+        elif move_origin_state == 222:
+            if time.ticks_ms() - move_origin_timer >= 10:
+                Off_sliding()
+                sliding_motor.active(0)
+                clear_tube_flag = True
+                clear_tube_state = 0
+                move_origin_state = 3
         elif move_origin_state == 3:
             move_origin = False
         elif move_origin_state == 100:                  # sliding motor hits limit switch
@@ -362,6 +375,14 @@ while True:
             clear_tube_state = 7
         elif clear_tube_state == 7:
             if box_location == 1:
+                clear_tube_timer = time.ticks_ms()
+                # sliding_motor.active(0)
+                # Off_sliding()
+                # set_sliding_backward()
+                clear_tube_state = 777
+                # clear_tube_flag = False
+        elif clear_tube_state == 777:
+            if time.ticks_ms() - clear_tube_timer >= 20:
                 sliding_motor.active(0)
                 Off_sliding()
                 set_sliding_backward()
@@ -755,13 +776,19 @@ while True:
                 if roller_limit_pin.value() == 1:
                     rolling_motor.active(1)
                     sliding_motor.active(0)
-                    #rolling_motor_dir_pin.value(1)
+                    rolling_motor_dir_pin.value(0)
                     set_sliding_backward()
                     clear_printer_controller()
                     main_state_timer = time.ticks_ms()
                     main_state = 300
             elif main_state == 300:
-                if time.ticks_ms() - main_state_timer >= 1:
+                if time.ticks_ms() - main_state_timer >= 20:
+                    main_state = 301
+                else: 
+                    rolling_motor.active(1)
+                    rolling_motor_dir_pin.value(0)
+            elif main_state == 301:
+                if time.ticks_ms() - main_state_timer >= 20:
                     rolling_motor_dir_pin.value(1) #edit
                     main_state_timer = time.ticks_ms()
                     main_state = 31        
@@ -820,6 +847,14 @@ while True:
                     main_state = 40
             elif main_state == 40:
                 if box_location == 1:
+                    main_state_timer = time.ticks_ms()
+                #     sliding_motor.active(0)
+                #     set_sliding_forward()
+                    main_state = 444
+                # resp_flag = False
+                # device_resp_message = ""
+            elif main_state == 444:
+                if time.ticks_ms()-main_state_timer >= 20:
                     sliding_motor.active(0)
                     set_sliding_forward()
                     main_state = 41

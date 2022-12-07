@@ -71,9 +71,9 @@ try:
         print("init ok")
 except:
     on_delay = 700
-    slap_up_time= 75
+    slap_up_time= 80
     wait_rolling_more_time = 50
-    slap_down_time = 70
+    slap_down_time = 55
     if show_debug:
         print("init fail")
 #======================================================================================================
@@ -352,7 +352,7 @@ while True:
             print("state 5")
             printer_state = 6
     elif printer_state == 6:
-        if time.ticks_ms() - printer_state_timer >= 30:
+        if time.ticks_ms() - printer_state_timer >= 100:
             printer_state_timer = time.ticks_ms()
             motor1_controller.active(0)
             motor2_controller.active(0)

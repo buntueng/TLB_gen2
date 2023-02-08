@@ -306,7 +306,7 @@ void execute_command(void)
         run_silo3 = false;
         run_silo4 = false;
         silo1_timer = millis();
-        //digitalWrite(EN_pin,LOW);
+        digitalWrite(EN_pin,LOW);
         break;
       }
       case '2':
@@ -318,7 +318,7 @@ void execute_command(void)
         run_silo3 = false;
         run_silo4 = false;
         silo2_timer = millis();
-        //digitalWrite(EN_pin,LOW);
+        digitalWrite(EN_pin,LOW);
         break;
       }
       case '3':
@@ -329,7 +329,7 @@ void execute_command(void)
         run_silo3 = true;
         run_silo4 = false;
         silo3_timer = millis();
-        //digitalWrite(EN_pin,LOW);
+        digitalWrite(EN_pin,LOW);
         break;
       }
       case '4':
@@ -341,7 +341,7 @@ void execute_command(void)
         run_silo3 = false;
         run_silo4 = true;
         silo4_timer = millis();
-       // digitalWrite(EN_pin,LOW);
+        digitalWrite(EN_pin,LOW);
         break;
       }
       default:
@@ -350,7 +350,7 @@ void execute_command(void)
         run_silo2 = false;
         run_silo3 = false;
         run_silo4 = false;
-        //digitalWrite(EN_pin,HIGH);
+        digitalWrite(EN_pin,HIGH);
       }
     }
   }
@@ -374,4 +374,5 @@ void setup_ios(void)
   digitalWrite(Y_DIR_pin,LOW);
   digitalWrite(Z_DIR_pin,LOW);
   digitalWrite(A_DIR_pin,LOW);
+  digitalWrite(EN_pin,LOW);
 }

@@ -71,9 +71,9 @@ try:
         print("init ok")
 except:
     on_delay = 700
-    slap_up_time= 80
+    slap_up_time= 75
     wait_rolling_more_time = 50
-    slap_down_time = 55
+    slap_down_time = 65
     if show_debug:
         print("init fail")
 #======================================================================================================
@@ -172,12 +172,19 @@ while True:
             On_roller()
             set_roller_motor_forward()
             motor1_controller.active(1)
+            time.sleep_ms(10)
+            motor1_controller.active(0)
+            Off_roller()
         elif paper_switch_eject.value() ==0:
             On_roller()
             set_roller_motor_backward()
             motor1_controller.active(1)
-        elif paper_switch_eject.value() ==1 and paper_switch_pull.value() ==1 :
+            time.sleep_ms(10)
+            motor1_controller.active(0)
             Off_roller()
+        # elif paper_switch_eject.value() ==1 and paper_switch_pull.value() ==1 :
+        #     motor1_controller.active(0)
+        #    pass
         else :
             pass
     else:
@@ -354,7 +361,7 @@ while True:
     elif printer_state == 6:
         if time.ticks_ms() - printer_state_timer >= 100:
             printer_state_timer = time.ticks_ms()
-            motor1_controller.active(0)
+            motor1_controller.active(1)
             motor2_controller.active(0)
             print("state 6")
             printer_state = 7
@@ -387,7 +394,7 @@ while True:
             debugging_timer = time.ticks_ms()
             debugging_state = 1
         elif debugging_state == 1:
-            if time.ticks_ms() - debugging_timer >= 1000:
+            if time.ticks_ms() - debugging_timer >= 100:
                 motor1_controller.active(0)
                 Off_roller()
                 debugging_state = 2
@@ -483,5 +490,4 @@ while True:
     elif origin_state == 5:     # slap switch error
         paper_test_flag = True
         
-
 

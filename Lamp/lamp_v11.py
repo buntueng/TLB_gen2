@@ -90,19 +90,36 @@ while True:
     result = read_cmd()
     if len(result) > 0:
         cmd = result[0]
-        if cmd[0] == 1:
+        lamp_number = cmd[0]
+        if lamp_number == 1:
             print("on lamp1")
             on_lamp1()
             clear_flag()
-        elif cmd[0] == 2:
+        elif lamp_number == 2:
             print("on lamp2")
             on_lamp2()
             clear_flag()
-        elif cmd[0] == 3:
+        elif lamp_number == 3:
             print("on lamp3")
             on_lamp3()
             clear_flag()
-        elif cmd[0] == 4:
+        elif lamp_number == 4:
+            print("on lamp4")
+            on_lamp4()
+            clear_flag()
+        if lamp_number == b'1':
+            print("on lamp1")
+            on_lamp1()
+            clear_flag()
+        elif lamp_number == b'2':
+            print("on lamp2")
+            on_lamp2()
+            clear_flag()
+        elif lamp_number == b'3':
+            print("on lamp3")
+            on_lamp3()
+            clear_flag()
+        elif lamp_number == b'4':
             print("on lamp4")
             on_lamp4()
             clear_flag()

@@ -7,6 +7,10 @@ server_params = None
 with open(r'./db_config.yaml') as file:
     server_params = yaml.load(file, Loader=yaml.FullLoader)
 
+now = datetime.datetime.now()
+begin_query_time = now.strftime('%Y-%m-%d  0:0:1')
+end_query_time = now.strftime('%Y-%m-%d %H:%M:%S')
+
 
 main_db = None
 main_db_cursor = None
@@ -25,7 +29,7 @@ if main_db and main_db_cursor:
     start_time = datetime.datetime.now()
     # query_string = "SELECT lab_order_number FROM lab_label WHERE time_Stamp BETWEEN '2023-03-08 0:0:1' AND '2023-03-08 23:59:59'"
     # query_string = "SELECT COUNT(lab_order_number) FROM lab_label WHERE time_Stamp BETWEEN '2023-03-08 0:0:1' AND '2023-03-08 23:59:59'"
-    query_string = "SELECT COUNT(*) FROM (SELECT count(lab_order_number) FROM lab_label WHERE time_Stamp BETWEEN '2023-03-08 0:0:1' AND '2023-03-08 23:59:59' GROUP BY lab_order_number) AS c"
+    query_string = f"SELECT COUNT(*) FROM (SELECT count(lab_order_number) FROM lab_label WHERE time_Stamp BETWEEN '{begin_query_time}' AND '{end_query_time}' GROUP BY lab_order_number) AS c"
 
     main_db_cursor.execute(query_string)
     query_result = main_db_cursor.fetchall()

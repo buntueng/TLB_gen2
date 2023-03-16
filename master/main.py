@@ -399,8 +399,6 @@ while True:
                 clear_tube_state = 1
                 clear_tube_timer = time.ticks_ms()
 
-
-
     # =========== command from pc ============
     if(pc_link.any()):
         try:
@@ -535,12 +533,11 @@ while True:
                             Off_sliding()
                             message = "stop machine"
                         pc_response(resp_message=message)
-            else:
-                if pc_command[0] <= '9':
-                    # other send commad to slaves
-                    device_message = pc_command + "\n"
-                    device_link.write(bytes( ord(ch) for ch in device_message))
-                    wait_slave2pc = True                                        # wait slaves response to pc
+            elif pc_command[0] <= '9':
+                # other send commad to slaves
+                device_message = pc_command + "\n"
+                device_link.write(bytes( ord(ch) for ch in device_message))
+                wait_slave2pc = True                                        # wait slaves response to pc
             execute_flag = False
             pc_command = ""
 

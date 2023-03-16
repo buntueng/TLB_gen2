@@ -198,7 +198,7 @@ def run_sliding_motor():
     set(pins, 0)   [31]
     nop()
     wrap()
-\
+
 @rp2.asm_pio(set_init=rp2.PIO.OUT_LOW)
 def run_sliding_motor_step2():
     wrap_target()
@@ -793,7 +793,7 @@ while True:
                     main_state_timer = time.ticks_ms()
                     main_state = 31        
             elif main_state == 31:
-                if time.ticks_ms()-main_state_timer >= 700:
+                if time.ticks_ms()-main_state_timer >= 500:
                     sliding_motor.active(1)
                     rolling_motor.active(0)
                     #on_solenoid1()

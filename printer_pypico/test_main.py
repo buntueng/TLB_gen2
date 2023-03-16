@@ -71,9 +71,9 @@ try:
         print("init ok")
 except:
     on_delay = 700
-    slap_up_time= 80
+    slap_up_time= 75
     wait_rolling_more_time = 50
-    slap_down_time = 50
+    slap_down_time = 65
     if show_debug:
         print("init fail")
 #======================================================================================================
@@ -108,7 +108,7 @@ debugging_state = 0
 device_link = UART(0, baudrate=9600, bits=8, parity=None, stop=1,tx=Pin(0), rx=Pin(1),timeout=1000)
 device_link.read()                                                                     # clear data in serial port buffer
 
-motor1_controller = rp2.StateMachine(0, run_motor1, freq=1500000, set_base=Pin(15))      # old === GPIO13 => pulse, GPIO12 => direction //roller
+motor1_controller = rp2.StateMachine(0, run_motor1, freq=2500000, set_base=Pin(15))      # old === GPIO13 => pulse, GPIO12 => direction //roller
 motor2_controller = rp2.StateMachine(1, run_motor2, freq=1200000, set_base=Pin(13))      # old === GPIO15 => pulse, GPIO14 => direction //slab
 #========== sub functions ==========
     
@@ -182,9 +182,9 @@ while True:
             time.sleep_ms(10)
             motor1_controller.active(0)
             Off_roller()
-        elif paper_switch_eject.value() ==1 and paper_switch_pull.value() ==1 :
-            motor1_controller.active(0)
-            pass
+        # elif paper_switch_eject.value() ==1 and paper_switch_pull.value() ==1 :
+        #     motor1_controller.active(0)
+        #    pass
         else :
             pass
     else:

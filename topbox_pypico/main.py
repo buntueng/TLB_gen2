@@ -180,7 +180,7 @@ while True:
     if execute_flag==True:
         # check command
         if len(master_command) > 0:
-            if master_command[0] == device_id:
+            if master_command[0] == device_id and len(master_command)>=2:
                 if master_command[1] == 'r':
                     message = "node " + device_id + " reset\n"
                     resp_485(message=message)
@@ -219,7 +219,7 @@ while True:
                     print("BoX4")
                     resp_485(message=message)
 
-                elif master_command[1] == '0':         # turnoff all motors
+                else:         # turnoff all motors
                     off_motor()
                     off_enb()
                     run_motor_flag = False

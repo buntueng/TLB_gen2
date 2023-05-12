@@ -78,7 +78,7 @@ void loop()
       }
       else
       {
-        if(sticker_detect_logic==false)
+        if(sticker_detect_logic==1)
         {
           on_motor();
           main_state = 3;

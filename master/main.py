@@ -210,7 +210,7 @@ def run_sliding_motor_step2():
 
 
 sliding_motor = rp2.StateMachine(0, run_sliding_motor, freq=2800000, set_base=Pin(16))      # GPIO16 => pulse, GPIO17 => direction //2600000
-rolling_motor = rp2.StateMachine(1, run_roller_motor, freq=2500000, set_base=Pin(18))      # GPIO18 => pulse, GPIO19 => direction
+rolling_motor = rp2.StateMachine(1, run_roller_motor, freq=1400000, set_base=Pin(18))      # GPIO18 => pulse, GPIO19 => direction
 rolling_motor.active(0)
 sliding_motor.active(0)
 rolling_motor_dir_pin.value(1)
@@ -235,6 +235,7 @@ while True:
     # check tube drop status
     #print(tube_drop_pin.value(), +sticker_detect_pin.value())
     # print(main_state)
+    # print(sticker_detect_pin)
     # time.sleep(0.1)
     # time.sleep(0.2)
     if tube_drop_pin.value() == 0:
@@ -382,12 +383,13 @@ while True:
                 clear_tube_state = 777
                 # clear_tube_flag = False
         elif clear_tube_state == 777:
-            if time.ticks_ms() - clear_tube_timer >= 20:
+            if time.ticks_ms() - clear_tube_timer >= 5:
                 sliding_motor.active(0)
                 Off_sliding()
                 set_sliding_backward()
                 clear_tube_state = 8
                 clear_tube_flag = False
+
 
         elif clear_tube_state == 10:
             if time.ticks_ms() - clear_tube_timer >= 200:
@@ -398,6 +400,8 @@ while True:
             if time.ticks_ms() - clear_tube_timer >= 200:
                 clear_tube_state = 1
                 clear_tube_timer = time.ticks_ms()
+
+
 
     # =========== command from pc ============
     if(pc_link.any()):
@@ -533,11 +537,12 @@ while True:
                             Off_sliding()
                             message = "stop machine"
                         pc_response(resp_message=message)
-            elif pc_command[0] <= '9':
-                # other send commad to slaves
-                device_message = pc_command + "\n"
-                device_link.write(bytes( ord(ch) for ch in device_message))
-                wait_slave2pc = True                                        # wait slaves response to pc
+            else:
+                if pc_command[0] <= '9':
+                    # other send commad to slaves
+                    device_message = pc_command + "\n"
+                    device_link.write(bytes( ord(ch) for ch in device_message))
+                    wait_slave2pc = True                                        # wait slaves response to pc
             execute_flag = False
             pc_command = ""
 
@@ -563,7 +568,7 @@ while True:
             off_solenoid2()
             off_solenoid3()
         # ======= check sticker detect =====
-        if sticker_detect_pin.value() == 0:
+        if sticker_detect_pin.value() == 1:
             sticker_detect_status = True
         try:
             if main_state == 0:
@@ -670,7 +675,7 @@ while True:
                 if time.ticks_ms() - main_state_timer >= 200:
                     #on_solenoid1()
                     main_state_timer = time.ticks_ms()
-                    sticker_detect_status = False
+                    # sticker_detect_status = False
                     main_state = 16
                 else:
                     if resp_flag:
@@ -686,9 +691,11 @@ while True:
                     main_state_timer = time.ticks_ms()
                     main_state = 18
                 else:
+                    sticker_detect_status = False
                     main_state = 19
             elif main_state == 18:
                 if time.ticks_ms()-main_state_timer >=300: #500
+                    sticker_detect_status = False
                     off_solenoid2()
                     off_solenoid1()
                     main_state = 19
@@ -818,7 +825,7 @@ while True:
             elif main_state == 34:
                 if time.ticks_ms() - main_state_timer >= 200:
                     off_solenoid1()
-                if box_location == 4 or time.ticks_ms() - main_state_timer >= 400:
+                if box_location == 4 or time.ticks_ms() - main_state_timer >= 700:
                     if box_location == 4:
                         main_state = 35
                     else:
@@ -851,7 +858,7 @@ while True:
                 # resp_flag = False
                 # device_resp_message = ""
             elif main_state == 444:
-                if time.ticks_ms()-main_state_timer >= 20:
+                if time.ticks_ms()-main_state_timer >= 5:
                     sliding_motor.active(0)
                     set_sliding_forward()
                     main_state = 41

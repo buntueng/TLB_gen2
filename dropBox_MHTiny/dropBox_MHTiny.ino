@@ -16,7 +16,8 @@ const int tube_detect_pin2 = 8;
 const int tube_detect_pin3 = 9;
 // ============ subfunctions ========
 void off_motor(void);
-void on_motor(void);
+void on_motor_for(void);
+void on_motor_bac(void);
 
 bool tube_drop_logic = false;
 bool sticker_detect_logic = false;
@@ -80,9 +81,14 @@ void loop()
       {
         if(sticker_detect_logic==1)
         {
-          on_motor();
+          on_motor_for();
           main_state = 3;
           state_timer = millis();
+        }
+        else
+        {
+          main_state = 0;
+          off_motor();
         }
       }
       break;
@@ -91,6 +97,17 @@ void loop()
     {
       if((millis()-state_timer)>=2000)
       {
+        off_motor();
+        main_state = 0;
+      }
+      if (sticker_detect_logic == 0)
+      {
+        off_motor();
+        delay(50);
+        on_motor_for();
+        delay(70);
+        on_motor_bac();
+        delay(10);
         off_motor();
         main_state = 0;
       }
@@ -109,8 +126,13 @@ void off_motor(void)
   digitalWrite(m1_pin1,LOW);
   digitalWrite(m1_pin2,LOW);
 }
-void on_motor(void)
+void on_motor_for(void)
 {
   digitalWrite(m1_pin1,HIGH);
   digitalWrite(m1_pin2,LOW);
+}
+void on_motor_bac(void)
+{
+  digitalWrite(m1_pin1,LOW);
+  digitalWrite(m1_pin2,HIGH);  
 }

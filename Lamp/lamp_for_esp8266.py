@@ -38,6 +38,16 @@ def clear_flag():
     sql_query = 'UPDATE TLB_Lamp SET flag = 0 WHERE flag = 1 ORDER BY time_stamp DESC LIMIT 1'
     database_cursor.execute(sql_query)
     db_connector.commit()
+R1()
+time.sleep(0.5)
+R2()
+time.sleep(0.5)
+R3()
+time.sleep(0.5)
+R4()
+time.sleep(0.5)
+R0()
+time.sleep(0.5)
 
 while True:
     time.sleep(2)

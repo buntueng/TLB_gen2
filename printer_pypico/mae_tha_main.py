@@ -70,10 +70,10 @@ try:
     if show_debug:
         print("init ok")
 except:
-    on_delay = 700
+    on_delay = 1800
     slap_up_time= 80
     wait_rolling_more_time = 50
-    slap_down_time = 35
+    slap_down_time = 50
     if show_debug:
         print("init fail")
 #======================================================================================================
@@ -83,9 +83,9 @@ paper_test_flag = True
 motor_state = 0
 motor_timer = 0
 # ========= assigned direction pin ===========
-paper_switch_pull = Pin(22,Pin.IN,Pin.PULL_UP)
-paper_switch_eject = Pin(26,Pin.IN,Pin.PULL_UP)
-duo_switch = Pin(27,Pin.IN,Pin.PULL_UP)
+paper_switch_pull = Pin(22,Pin.IN,Pin.PULL_DOWN)
+paper_switch_eject = Pin(19,Pin.IN,Pin.PULL_DOWN)
+duo_switch = Pin(27,Pin.IN,Pin.PULL_DOWN)
 slap_switch = Pin(20,Pin.IN,Pin.PULL_UP)
 motor1_dir_pin = Pin(14,Pin.OUT)                    # paper roller motor old =====12
 motor2_dir_pin = Pin(12,Pin.OUT)                    # slap motor old ===== 14
@@ -166,25 +166,24 @@ while True:
     # time.sleep(0.2)
     # print(duo_switch.value())
     # print(paper_switch_pull.value())
-    # print(paper_switch_eject.value())
+    # print(paper_switch_eject.value(),paper_switch_pull.value())
     if paper_test_flag == True:
-        if paper_switch_pull.value() ==0:
+        if paper_switch_pull.value() ==1:
             On_roller()
             set_roller_motor_forward()
             motor1_controller.active(1)
             time.sleep_ms(10)
             motor1_controller.active(0)
             Off_roller()
-        elif paper_switch_eject.value() ==0:
+        elif paper_switch_eject.value() ==1:
             On_roller()
             set_roller_motor_backward()
             motor1_controller.active(1)
             time.sleep_ms(10)
             motor1_controller.active(0)
             Off_roller()
-        elif paper_switch_eject.value() ==1 and paper_switch_pull.value() ==1 :
-            motor1_controller.active(0)
-            pass
+        # elif paper_switch_eject.value() ==0 and paper_switch_pull.value() ==0 :
+        #     motor1_controller.active(0)
         else :
             pass
     else:

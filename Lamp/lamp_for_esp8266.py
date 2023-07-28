@@ -2,8 +2,15 @@ import time
 from mysql.connector import connect 
 import serial 
 
-ser = serial.Serial(
+ser1 = serial.Serial(
         port='COM8',
+        baudrate = 9600,
+        parity=serial.PARITY_NONE,
+        stopbits=serial.STOPBITS_ONE,
+        bytesize=serial.EIGHTBITS,
+        timeout=0.5 )
+ser2 = serial.Serial(
+        port='COM9',
         baudrate = 9600,
         parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_ONE,
@@ -11,15 +18,20 @@ ser = serial.Serial(
         timeout=0.5 )
 
 def R1():
-    ser.write("R1\n".encode())
+    ser1.write("R1\n".encode())
 def R2():
-    ser.write("R2\n".encode())
+    ser1.write("R2\n".encode())
 def R3():
-    ser.write("R3\n".encode())
+    ser1.write("R3\n".encode())
 def R4():
-    ser.write("R4\n".encode())
+    ser1.write("R4\n".encode())
+def R5():
+    ser2.write("R5\n".encode())
+def R6():
+    ser2.write("R6\n".encode())
 def R0():
-    ser.write("R0\n".encode())
+    ser1.write("R0\n".encode())
+    ser2.write("R0\n".encode())
 
 db_connector =  connect(host="localhost", user="root", port = 3333, passwd="edgelabeling555",  db="sbj",  charset="utf8"  )
 database_cursor = db_connector.cursor()
@@ -38,6 +50,10 @@ def clear_flag():
     sql_query = 'UPDATE TLB_Lamp SET flag = 0 WHERE flag = 1 ORDER BY time_stamp DESC LIMIT 1'
     database_cursor.execute(sql_query)
     db_connector.commit()
+
+# ser1.open()
+# ser2.open()
+# time.sleep(3)
 R1()
 time.sleep(0.5)
 R2()
@@ -45,6 +61,10 @@ time.sleep(0.5)
 R3()
 time.sleep(0.5)
 R4()
+time.sleep(0.5)
+R5()
+time.sleep(0.5)
+R6()
 time.sleep(0.5)
 R0()
 time.sleep(0.5)
@@ -78,6 +98,18 @@ while True:
             R0()
             time.sleep(0.1)
             R4()
+            time.sleep(0.2)
+            clear_flag()
+        elif lamp_number == '5':
+            R0()
+            time.sleep(0.1)
+            R5()
+            time.sleep(0.2)
+            clear_flag()
+        elif lamp_number == '6':
+            R0()
+            time.sleep(0.1)
+            R6()
             time.sleep(0.2)
             clear_flag()
         elif lamp_number == '0':

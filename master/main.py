@@ -235,14 +235,17 @@ while True:
     # check tube drop status
     #print(tube_drop_pin.value(), +sticker_detect_pin.value())
     # print(main_state)
-    # print(sticker_detect_pin)
+    # print(sticker_detect_status)
     # time.sleep(0.1)
     # time.sleep(0.2)
     if tube_drop_pin.value() == 0:
         tube_drop_status = True
-        
+
     if sticker_detect_pin.value() == 1:
         sticker_detect_status = True
+
+    if sticker_detect_pin.value() == 0:
+        sticker_detect_status = False
 
     if wait_slave2pc and resp_flag:
         resp_flag = False
@@ -683,34 +686,40 @@ while True:
                     if resp_flag:
                         resp_flag = False
                         device_resp_message = ""
-
             elif main_state == 16:
                 if time.ticks_ms() - main_state_timer >= 200:
                     off_solenoid1()
-                    if sticker_detect_status == True:
-                        on_solenoid2()
-                        main_state_timer = time.ticks_ms()
-                        main_state = 17
-                    else:
-                        sticker_detect_status = False
-                        main_state = 19
+                    main_state = 17
 
             elif main_state == 17:
-                if time.ticks_ms()-main_state_timer >=1000:
+                if sticker_detect_status == True:
+                    on_solenoid2()
                     main_state_timer = time.ticks_ms()
                     main_state = 18
                 if sticker_detect_status == False:
-                    off_solenoid2()
-                    main_state = 19
+                    main_state = 181
+                    # print("1")
+                    on_solenoid2()
 
             elif main_state == 18:
-                if time.ticks_ms()-main_state_timer >=500: #500
-                    sticker_detect_status = False
+                if time.ticks_ms()-main_state_timer >=1000: #500
+                    # sticker_detect_status = False
+                    # print("0")
                     off_solenoid2()
+                    off_solenoid1()
                     main_state = 19
                 if sticker_detect_status == False:
+                    off_solenoid1()
                     off_solenoid2()
-
+                    # print("111")
+                    main_state = 181
+                    # sticker_detect_status = False
+            elif main_state == 181:
+                    off_solenoid1()
+                    off_solenoid2()
+                    # print("111111")
+                    main_state = 19
+                    # sticker_detect_status = False
             elif main_state == 19:
                 sliding_motor.active(1)
                 if present_silo == 1:
@@ -916,15 +925,10 @@ while True:
             elif main_state == 70:
                 if time.ticks_ms() - main_state_timer >= 130: #100
                     stop_silo()
-                    # on_solenoid1()
-                    main_state_timer = time.ticks_ms()
-                    main_state = 71
-            elif main_state == 71:
-                if time.ticks_ms() - main_state_timer >= 200: #100
-                    # stop_silo()
                     on_solenoid1()
                     main_state_timer = time.ticks_ms()
-                    main_state = 15                
+                    main_state = 15
+
         except:
             Off_sliding()
             main_state = 207
@@ -938,6 +942,5 @@ while True:
         #main_state == 206:             # printer module not response
         #main_state == 207:              # there is an error from try condition
         #main_state == 208:             # can not go to roller
-
 
 

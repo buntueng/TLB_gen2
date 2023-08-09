@@ -81,21 +81,17 @@ silo3_ENB_pin = Pin(16,Pin.OUT)
 silo4_ENB_pin = Pin(19,Pin.OUT)
 silo5_ENB_pin = Pin(22,Pin.OUT)
 silo6_ENB_pin = Pin(28,Pin.OUT)
-#=============== LIMIT TUBE PIN ================
-box1_limit_select_tube_pin = Pin(3,Pin.IN,Pin.PULL_UP)
-box1_limit_release_tube_pin = Pin(4,Pin.IN,Pin.PULL_UP)
-
 #===============================================
 
 device_link = UART(1, baudrate=9600, bits=8, parity=None, stop=1,tx=Pin(8), rx=Pin(9),timeout=1000)
 device_link.read()              # clear data in serial port buffer
 
-silo1_motor = rp2.StateMachine(0, run_silo1_motor, freq=23000, set_base=Pin(6))      # GPIO16 => pulse, GPIO17 => direction
-silo2_motor = rp2.StateMachine(1, run_silo2_motor, freq=23000, set_base=Pin(12))      # GPIO18 => pulse, GPIO19 => direction
-silo3_motor = rp2.StateMachine(2, run_silo3_motor, freq=23000, set_base=Pin(14))####      # GPIO18 => pulse, GPIO21 => direction
-silo4_motor = rp2.StateMachine(3, run_silo4_motor, freq=23000, set_base=Pin(18))###      # GPIO18 => pulse, GPIO27 => direction
-silo5_motor = rp2.StateMachine(4, run_silo5_motor, freq=23000, set_base=Pin(21))
-silo6_motor = rp2.StateMachine(5, run_silo4_motor, freq=23000, set_base=Pin(27))
+silo1_motor = rp2.StateMachine(0, run_silo1_motor, freq=200000, set_base=Pin(6))      # GPIO16 => pulse, GPIO17 => direction // 23000
+silo2_motor = rp2.StateMachine(1, run_silo2_motor, freq=200000, set_base=Pin(12))      # GPIO18 => pulse, GPIO19 => direction
+silo3_motor = rp2.StateMachine(2, run_silo3_motor, freq=200000, set_base=Pin(14))####      # GPIO18 => pulse, GPIO21 => direction
+silo4_motor = rp2.StateMachine(3, run_silo4_motor, freq=200000, set_base=Pin(18))###      # GPIO18 => pulse, GPIO27 => direction
+silo5_motor = rp2.StateMachine(4, run_silo5_motor, freq=200000, set_base=Pin(21))
+silo6_motor = rp2.StateMachine(5, run_silo4_motor, freq=200000, set_base=Pin(27))
 #========== sub functions ==========
 def on_motor(motor_number):
     if motor_number == 1:
@@ -250,8 +246,7 @@ initial_io()
 
 while True:
     # get proximeter sensors
-    # print(box1_limit_select_tube_pin.value(),box1_limit_release_tube_pin.value())
-    # time.sleep(0.2)
+
     # =========== command from pc ============
     if(device_link.any()):
         char_cmd = device_link.read(1)

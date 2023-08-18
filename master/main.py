@@ -551,8 +551,6 @@ while True:
                     wait_slave2pc = True                                        # wait slaves response to pc
             execute_flag = False
             pc_command = ""
-
-    
     
     if run_main_state:
         #======== check prox sensor ======

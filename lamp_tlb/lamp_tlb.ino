@@ -10,10 +10,12 @@ String cmd_string;
 void setup()
   {
     Serial.begin(9600);
+    Serial.flush();
     pinMode(relay1, OUTPUT);
     pinMode(relay2, OUTPUT);
     pinMode(relay3, OUTPUT);
     pinMode(relay4, OUTPUT);
+    Serial.println("TESTSETESTSET");
   }
 void loop() 
   {

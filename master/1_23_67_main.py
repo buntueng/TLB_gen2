@@ -551,8 +551,6 @@ while True:
                     wait_slave2pc = True                                        # wait slaves response to pc
             execute_flag = False
             pc_command = ""
-
-    
     
     if run_main_state:
         #======== check prox sensor ======
@@ -672,12 +670,15 @@ while True:
                     main_state = 205
                 else:
                     if tube_drop_status:
+                        #stop_silo()
                         main_state_timer = time.ticks_ms()
                         main_state = 70
                         tube_drop_status = False            
             elif main_state == 15:
                 if time.ticks_ms() - main_state_timer >= 200:
+                    #on_solenoid1()
                     main_state_timer = time.ticks_ms()
+                    # sticker_detect_status = False
                     main_state = 16
                 else:
                     if resp_flag:
@@ -686,71 +687,37 @@ while True:
             elif main_state == 16:
                 if time.ticks_ms() - main_state_timer >= 200:
                     off_solenoid1()
-                    main_state_timer = time.ticks_ms()
                     main_state = 17
 
             elif main_state == 17:
-                if time.ticks_ms() - main_state_timer >= 1000:    
-                    if sticker_detect_status == True:
-                        on_solenoid2()
-                        main_state_timer = time.ticks_ms()
-                        main_state = 18
-                    else:
-                        on_solenoid2()
-                        main_state_timer = time.ticks_ms()
-                        main_state = 181
+                if sticker_detect_status == True:
+                    on_solenoid2()
+                    main_state_timer = time.ticks_ms()
+                    main_state = 18
+                if sticker_detect_status == False:
+                    main_state = 181
+                    # print("1")
+                    on_solenoid2()
+
             elif main_state == 18:
-                if time.ticks_ms()-main_state_timer >=10000: #500
+                if time.ticks_ms()-main_state_timer >=1000: #500
+                    # sticker_detect_status = False
+                    # print("0")
                     off_solenoid2()
                     off_solenoid1()
                     main_state = 19
-                if time.ticks_ms()-main_state_timer >=2000: #500    
-                    if sticker_detect_status == True:
-                        off_solenoid2()
-                        off_solenoid1()
-                        main_state = 19
-
+                if sticker_detect_status == False:
+                    off_solenoid1()
+                    off_solenoid2()
+                    # print("111")
+                    main_state = 181
+                    # sticker_detect_status = False
             elif main_state == 181:
-                if time.ticks_ms() - main_state_timer >= 4000: #20
-                    off_solenoid2()
                     off_solenoid1()
+                    off_solenoid2()
+                    # print("111111")
                     main_state = 19
-                if time.ticks_ms()-main_state_timer >=2000: #500 
-                    if sticker_detect_status == True:
-                        off_solenoid2()
-                        off_solenoid1()
-                        main_state = 19
-            # elif main_state == 17:
-            #     if sticker_detect_status == True:
-            #         on_solenoid2()
-            #         main_state_timer = time.ticks_ms()
-            #         main_state = 18
-            #     if sticker_detect_status == False:
-            #         main_state = 181
-            #         # print("1")
-            #         on_solenoid2()
-
-            # elif main_state == 18:
-            #     if time.ticks_ms()-main_state_timer >=1000: #500
-            #         # sticker_detect_status = False
-            #         # print("0")
-            #         off_solenoid2()
-            #         off_solenoid1()
-            #         main_state = 19
-            #     if sticker_detect_status == False:
-            #         off_solenoid1()
-            #         off_solenoid2()
-            #         # print("111")
-            #         main_state = 181
-            #         # sticker_detect_status = False
-            # elif main_state == 181:
-            #         off_solenoid1()
-            #         off_solenoid2()
-            #         # print("111111")
-            #         main_state = 19
-            #         # sticker_detect_status = False
-                    
-
+                    # sticker_detect_status = False
             elif main_state == 19:
                 sliding_motor.active(1)
                 if present_silo == 1:

@@ -25,18 +25,19 @@ bool sticker_detect_logic = false;
 unsigned long state_timer = 0;
 unsigned int main_state = 0;
 
-void setup() {
-  mySerial.begin(9600);
-  pinMode(m1_pin1,OUTPUT);
-  pinMode(m1_pin2,OUTPUT);
-  off_motor();
-  pinMode(sticker_detect_pin,OUTPUT);
-  pinMode(tube_detect_pin,OUTPUT);
-  pinMode(sticker_detec_pin,INPUT);
-  pinMode(tube_detect_pin1,INPUT);
-  pinMode(tube_detect_pin2,INPUT);
-  pinMode(tube_detect_pin3,INPUT);
-}
+void setup() 
+  {
+    mySerial.begin(9600);
+    pinMode(m1_pin1,OUTPUT);
+    pinMode(m1_pin2,OUTPUT);
+    off_motor();
+    pinMode(sticker_detect_pin,OUTPUT);
+    pinMode(tube_detect_pin,OUTPUT);
+    pinMode(sticker_detec_pin,INPUT);
+    pinMode(tube_detect_pin1,INPUT);
+    pinMode(tube_detect_pin2,INPUT);
+    pinMode(tube_detect_pin3,INPUT);
+  }
 
 void loop()
 {
@@ -48,7 +49,7 @@ void loop()
   mySerial.println(sticker_detect_logic);
   //========================================
   digitalWrite(tube_detect_pin,tube_drop_logic);
-  digitalWrite(sticker_detect_pin,sticker_detect_logic);
+  // digitalWrite(sticker_detect_pin,sticker_detect_logic);
   // =========== run state machine =========
   switch(main_state)
   {
@@ -74,43 +75,63 @@ void loop()
     {
       if((millis()-state_timer)>= 500)
       {
-        main_state = 0;
-        state_timer = millis();
-      }
-      else
-      {
-        if(sticker_detect_logic==1)
+        if(sticker_detect_logic==0)
         {
-          on_motor_for();
           main_state = 3;
           state_timer = millis();
         }
-        else
+        else 
         {
-          main_state = 0;
-          off_motor();
+          on_motor_for();
+        }
+        if((millis()-state_timer)>= 10000)
+        {
+          main_state = 3;
+          state_timer = millis();
         }
       }
+      // if((millis()-state_timer)>= 500)
+      // {
+      //   main_state = 0;
+      //   state_timer = millis();
+      // }
+      // else
+      // {
+      //   if(sticker_detect_logic==1)
+      //   {
+      //     on_motor_for();
+      //     main_state = 3;
+      //     state_timer = millis();
+      //   }
+      //   else
+      //   {
+      //     main_state = 0;
+      //     off_motor();
+      //   }
+      // }
       break;
     }
     case 3:
     {
-      if((millis()-state_timer)>=2000)
-      {
-        off_motor();
-        main_state = 0;
-      }
-      if (sticker_detect_logic == 0)
-      {
-        off_motor();
-        delay(50);
-        on_motor_for();
-        delay(70);
-        on_motor_bac();
-        delay(10);
-        off_motor();
-        main_state = 0;
-      }
+      digitalWrite(sticker_detect_pin,sticker_detect_logic);
+      off_motor();
+      main_state = 0;
+      // if((millis()-state_timer)>=2000)
+      // {
+      //   off_motor();
+      //   main_state = 0;
+      // }
+      // if (sticker_detect_logic == 0)
+      // {
+      //   off_motor();
+      //   delay(50);
+      //   on_motor_for();
+      //   delay(70);
+      //   on_motor_bac();
+      //   delay(10);
+      //   off_motor();
+      //   main_state = 0;
+      // }
       break;
     }
     default:
@@ -118,21 +139,20 @@ void loop()
       main_state = 0;
     }
   }
-
 }
 
 void off_motor(void)
-{
-  digitalWrite(m1_pin1,LOW);
-  digitalWrite(m1_pin2,LOW);
-}
+  {
+    digitalWrite(m1_pin1,LOW);
+    digitalWrite(m1_pin2,LOW);
+  }
 void on_motor_for(void)
-{
-  digitalWrite(m1_pin1,HIGH);
-  digitalWrite(m1_pin2,LOW);
-}
+  {
+    digitalWrite(m1_pin1,HIGH);
+    digitalWrite(m1_pin2,LOW);
+  }
 void on_motor_bac(void)
-{
-  digitalWrite(m1_pin1,LOW);
-  digitalWrite(m1_pin2,HIGH);  
-}
+  {
+    digitalWrite(m1_pin1,LOW);
+    digitalWrite(m1_pin2,HIGH);  
+  }
